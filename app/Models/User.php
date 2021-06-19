@@ -47,6 +47,11 @@ class User extends Authenticatable
         return $this->morphedByMany(Role::class, 'userable');
     }
 
+    public function claims()
+    {
+        return $this->hasMany(Claim::class);
+    }
+
     public function assignRole(Role $role)
     {
         return $this->roles()->save($role);

@@ -49,7 +49,7 @@ class AuthApiController extends Controller
             'message' => 'Login Successful',
             'data' => [
                 'token' => $token,
-                'member' => Auth::user(),
+                'user' => new UserResource(Auth::user()),
             ]
         ]);
     }

@@ -39,7 +39,6 @@ class RoleController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'label' => 'required|string|max:255|unique:roles',
             'max_slots' => 'required|integer',
             'isSuper' => 'required'
         ]);
@@ -81,7 +80,7 @@ class RoleController extends Controller
 
     public function show($role)
     {
-        $role = Role::find($role);
+        $role = Role::where('label', $role)->first();
 
         if (! $role) {
             return response()->json([
@@ -100,7 +99,7 @@ class RoleController extends Controller
 
     public function edit($role)
     {
-        $role = Role::find($role);
+        $role = Role::where('label', $role)->first();
 
         if (! $role) {
             return response()->json([
@@ -171,7 +170,7 @@ class RoleController extends Controller
 
     public function destroy($role)
     {
-        $role = Role::find($role);
+        $role = Role::where('label', $role)->first();
 
         if (! $role) {
             return response()->json([

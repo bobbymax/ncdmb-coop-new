@@ -7,18 +7,30 @@ use Illuminate\Support\Facades\Route;
 Route::group(['middleware' => ['cors', 'json.response']], function () {
     Route::post('login', 'AuthApiController@login');
 
+    // Configuration Routes
+    Route::get('get/models', 'ConfigurationController@fetchModels');
+    Route::get('get/models/{model}/columns', 'ConfigurationController@getColumns');
+
     // Access Control
-    Route::resource('roles', 'RoleController');
-    Route::resource('modules', 'ModuleController');
-    Route::resource('departments', 'DepartmentController');
-    Route::resource('groups', 'GroupController');
+    Route::apiResource('roles', 'RoleController');
+    Route::apiResource('modules', 'ModuleController');
+    Route::apiResource('departments', 'DepartmentController');
+    Route::apiResource('groups', 'GroupController');
+    Route::apiResource('users', 'StaffController');
 
     // Budget Control
-    Route::resource('budgetHeads', 'BudgetHeadController');
-    Route::resource('subBudgetHeads', 'SubBudgetHeadController');
-    Route::resource('creditBudgetHeads', 'CreditBudgetHeadController');
-    Route::resource('expenditures', 'ExpenditureController');
-    Route::resource('batches', 'BatchController');
+    Route::apiResource('budgetHeads', 'BudgetHeadController');
+    Route::apiResource('subBudgetHeads', 'SubBudgetHeadController');
+    Route::apiResource('creditBudgetHeads', 'CreditBudgetHeadController');
+    Route::apiResource('expenditures', 'ExpenditureController');
+    Route::apiResource('batches', 'BatchController');
+
+    // Staff Structure
+    Route::apiResource('gradeLevels', 'GradeLevelController');
+    Route::apiResource('benefits', 'BenefitController');
+    Route::apiResource('entitlements', 'EntitlementController');
+    Route::apiResource('claims', 'ClaimController');
+    Route::apiResource('claims/{claim}/instructions', 'InstructionController');
 
     // Additional Access Control Routes
     Route::post('groups/{group}/staffs', 'GroupController@addStaffsToGroup');
@@ -35,6 +47,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::fallback(function () {
     return response()->json([
-        'message' => 'Page Not Found. If error persists, contact info@ncdmb.com'
+        'message' => 'Page Not Found. If error persists, contact info@ncdmb.gov.ng'
     ], 404);
 });
