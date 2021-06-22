@@ -10,6 +10,7 @@ class Group extends Model
     use HasFactory;
 
     protected $guarded = [''];
+    protected $dates = ['start_date', 'expiry_date'];
 
     public function staffs()
     {

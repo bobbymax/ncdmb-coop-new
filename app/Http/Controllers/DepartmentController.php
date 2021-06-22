@@ -6,6 +6,7 @@ use App\Models\Department;
 use App\Models\Module;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class DepartmentController extends Controller
 {
@@ -59,7 +60,6 @@ class DepartmentController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'label' => 'required|string|max:255|unique:departments',
             'code' => 'required|string|max:7|unique:departments',
             'type' => 'required|string|in:directorate,division,department,unit',
             'parentId' => 'required'
@@ -75,7 +75,7 @@ class DepartmentController extends Controller
 
         $department = Department::create([
             'name' => $request->name,
-            'label' => $request->label,
+            'label' => Str::slug($request->name),
             'code' => $request->code,
             'type' => $request->type,
             'parentId' => $request->parentId
@@ -188,8 +188,6 @@ class DepartmentController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'label' => 'required|string|max:255|unique:departments',
-            'code' => 'required|string|max:7|unique:departments',
             'type' => 'required|string|in:directorate,division,department,unit',
             'parentId' => 'required'
         ]);
@@ -214,7 +212,7 @@ class DepartmentController extends Controller
 
         $department->update([
             'name' => $request->name,
-            'label' => $request->label,
+            'label' => Str::slug($request->name),
             'code' => $request->code,
             'type' => $request->type,
             'parentId' => $request->parentId
@@ -245,10 +243,11 @@ class DepartmentController extends Controller
             ], 422);
         }
 
+        $old = $department;
         $department->delete();
 
         return response()->json([
-            'data' => null,
+            'data' => $old,
             'status' => 'success',
             'message' => 'Department deleted successfully!'
         ], 200);

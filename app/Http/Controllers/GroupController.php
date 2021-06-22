@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\GroupResource;
 use App\Models\Group;
 use App\Models\User;
 use Carbon\Carbon;
@@ -34,7 +35,7 @@ class GroupController extends Controller
         }
 
         return response()->json([
-            'data' => $groups,
+            'data' => GroupResource::collection($groups),
             'status' => 'success',
             'message' => 'Group List'
         ], 200);
@@ -60,7 +61,6 @@ class GroupController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'label' => 'required|string|max:255|unique:groups',
             'max_slots' => 'required|integer',
             'start_date' => 'required|date',
         ]);
@@ -75,15 +75,15 @@ class GroupController extends Controller
 
         $group = Group::create([
             'name' => $request->name,
-            'label' => $request->label ?? Str::slug($request->name),
+            'label' => Str::slug($request->name),
             'max_slots' => $request->max_slots,
             'start_date' => Carbon::parse($request->start_date),
-            'end_date' => $request->end_date != null ? Carbon::parse($request->end_date) : null,
-            'cannot_expire' => isset($request->cannot_expire) && $request->cannot_expire == "on",
+            'expiry_date' => $request->expiry_date != null ? Carbon::parse($request->expiry_date) : null,
+            'cannot_expire' => $request->cannot_expire,
         ]);
 
         return response()->json([
-            'data' => $group,
+            'data' => new GroupResource($group),
             'status' => 'success',
             'message' => 'Group details have been created successfully!'
         ], 201);
@@ -108,7 +108,7 @@ class GroupController extends Controller
         }
 
         return response()->json([
-            'data' => $group,
+            'data' => new GroupResource($group),
             'status' => 'success',
             'message' => 'Group details'
         ], 200);
@@ -133,7 +133,7 @@ class GroupController extends Controller
         }
 
         return response()->json([
-            'data' => $group,
+            'data' => new GroupResource($group),
             'status' => 'success',
             'message' => 'Group details'
         ], 200);
@@ -172,7 +172,7 @@ class GroupController extends Controller
         }
 
         return response()->json([
-            'data' => $group,
+            'data' => new GroupResource($group),
             'status' => 'success',
             'message' => 'Staffs have been added to this group successfully!'
         ], 200);
@@ -189,7 +189,6 @@ class GroupController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'label' => 'required|string|max:255|unique:groups',
             'max_slots' => 'required|integer',
             'start_date' => 'required|date',
         ]);
@@ -214,15 +213,15 @@ class GroupController extends Controller
 
         $group->update([
             'name' => $request->name,
-            'label' => $request->label ?? Str::slug($request->name),
+            'label' => Str::slug($request->name),
             'max_slots' => $request->max_slots,
             'start_date' => Carbon::parse($request->start_date),
-            'end_date' => $request->end_date != null ? Carbon::parse($request->end_date) : null,
-            'cannot_expire' => isset($request->cannot_expire) && $request->cannot_expire == "on",
+            'expiry_date' => $request->expiry_date != null ? Carbon::parse($request->expiry_date) : null,
+            'cannot_expire' => $request->cannot_expire,
         ]);
 
         return response()->json([
-            'data' => $group,
+            'data' => new GroupResource($group),
             'status' => 'success',
             'message' => 'Group details have been updated successfully!'
         ], 200);
@@ -246,10 +245,11 @@ class GroupController extends Controller
             ], 422);
         }
 
+        $old = $group;
         $group->delete();
 
         return response()->json([
-            'data' => null,
+            'data' => $old,
             'status' => 'success',
             'message' => 'Group details have been deleted successfully!'
         ], 200);

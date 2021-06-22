@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\RoleResource;
 use App\Models\Permission;
 use App\Models\Role;
 use Illuminate\Http\Request;
@@ -29,7 +30,7 @@ class RoleController extends Controller
         }
 
         return response()->json([
-            'data' => $roles,
+            'data' => RoleResource::collection($roles),
             'status' => 'success',
             'message' => 'Roles list'
         ], 200);
@@ -72,7 +73,7 @@ class RoleController extends Controller
         }
 
         return response()->json([
-            'data' => $role,
+            'data' => new RoleResource($role),
             'status' => 'success',
             'message' => 'Role has been created successfully!'
         ], 201);
@@ -91,7 +92,7 @@ class RoleController extends Controller
         }
 
         return response()->json([
-            'data' => $role,
+            'data' => new RoleResource($role),
             'status' => 'success',
             'message' => 'Role Details'
         ], 200);
@@ -110,7 +111,7 @@ class RoleController extends Controller
         }
 
         return response()->json([
-            'data' => $role,
+            'data' => new RoleResource($role),
             'status' => 'success',
             'message' => 'Role Details'
         ], 200);
@@ -162,7 +163,7 @@ class RoleController extends Controller
         }
 
         return response()->json([
-            'data' => $role,
+            'data' => new RoleResource($role),
             'status' => 'success',
             'message' => 'Role updated successfully!'
         ], 200);
@@ -180,10 +181,12 @@ class RoleController extends Controller
             ], 422);
         }
 
+        $old = $role;
+
         $role->delete();
 
         return response()->json([
-            'data' => null,
+            'data' => new RoleResource($old),
             'status' => 'success',
             'message' => 'Role deleted successfully!'
         ], 200);

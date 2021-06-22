@@ -57,12 +57,12 @@ class ModuleController extends Controller
             'label' => Str::slug($request->name),
             'icon' => $request->icon,
             'parentId' => $request->parentId,
-            'generatePermissions' => $request->generatePermissions == "on",
+            'generatePermissions' => $request->generatePermissions,
             'isMenu' => $request->isMenu,
             'isAdministration' => $request->isAdministration
         ]);
 
-        if ($request->generatePermissions === "on") {
+        if ($request->generatePermissions) {
 
             foreach ($module->normalizer($module->name) as $value) {
                 $permission = $module->savePermission($value, $module->name);
@@ -191,7 +191,7 @@ class ModuleController extends Controller
         }
 
         return response()->json([
-            'data' => $module,
+            'data' => new ModuleResource($module),
             'status' => 'success',
             'message' => 'Groups have been added to this module successfully!'
         ], 200);
@@ -251,10 +251,11 @@ class ModuleController extends Controller
             ], 422);
         }
 
+        $old = $module;
         $module->delete();
 
         return response()->json([
-            'data' => null,
+            'data' => $old,
             'status' => 'success',
             'message' => 'Module deleted successfully!'
         ], 200);

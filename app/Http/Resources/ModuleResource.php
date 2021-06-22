@@ -18,8 +18,11 @@ class ModuleResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'icon' => $this->icon,
+            'parentId' => $this->parentId,
             'parent' => $this->parentId != 0 ? $this->parent->name : 'None',
-            'administrative' => $this->isAdministration,
+            'isAdministration' => $this->isAdministration,
+            'isMenu' => $this->isMenu,
             'roles' => $this->roles,
             'permissions' => $this->generatePermissions ? $this->permissions : 'No Permissions'
         ];
