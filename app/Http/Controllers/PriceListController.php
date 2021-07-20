@@ -3,12 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\BenefitResource;
+use App\Http\Resources\PriceListResource;
 use App\Models\Benefit;
+use App\Models\PriceList;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 
-class BenefitController extends Controller
+class PriceListController extends Controller
 {
     public function __construct()
     {
@@ -22,20 +23,31 @@ class BenefitController extends Controller
      */
     public function index()
     {
-        $benefits = Benefit::all();
+        $prices = PriceList::all();
 
-        if ($benefits->count() < 1) {
+        if ($prices->count() < 1) {
             return response()->json([
                 'data' => [],
-                'status' => 'error',
+                'status' => 'info',
                 'message' => 'No data found!!'
             ], 200);
         }
 
         return response()->json([
+            'data' => PriceListResource::collection($prices),
+            'status' => 'success',
+            'message' => 'Price Lists'
+        ], 200);
+    }
+
+    public function getDependencies()
+    {
+        $benefits = Benefit::all();
+
+        return response()->json([
             'data' => BenefitResource::collection($benefits),
             'status' => 'success',
-            'message' => 'Benefit List'
+            'message' => 'Dependencies'
         ], 200);
     }
 
@@ -58,9 +70,8 @@ class BenefitController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'parentId' => 'required',
-            'numOfDays' => 'required'
+            'benefit_id' => 'required|integer',
+            'amount' => 'required|integer'
         ]);
 
         if ($validator->fails()) {
@@ -71,68 +82,85 @@ class BenefitController extends Controller
             ], 500);
         }
 
-        $benefit = Benefit::create([
-            'name' => $request->name,
-            'label' => Str::slug($request->name),
-            'parentId' => $request->parentId,
-            'numOfDays' => $request->numOfDays,
-            'description' => $request->description
+        $benefit = Benefit::find($request->benefit_id);
+
+        if(! $benefit) {
+            return response()->json([
+                'data' => null,
+                'status' => 'error',
+                'message' => 'Invalid token'
+            ], 422);
+        }
+
+        $exists = $benefit->prices->where('amount', $request->amount)->first();
+
+        if ($exists) {
+            return response()->json([
+                'data' => null,
+                'status' => 'warning',
+                'message' => 'Price already exists for this benefit!!'
+            ], 422);
+        }
+
+        $price = PriceList::create([
+            'benefit_id' => $benefit->id,
+            'amount' => $request->amount
         ]);
 
         return response()->json([
-            'data' => new BenefitResource($benefit),
+            'data' => new PriceListResource($price),
             'status' => 'success',
-            'message' => 'Benefit created successfully!'
+            'message' => 'Entitlement created successfully!'
         ], 201);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Benefit  $benefit
+     * @param  \App\Models\PriceList  $priceList
      * @return \Illuminate\Http\JsonResponse
      */
-    public function show($benefit)
+    public function show($priceList)
     {
-        $benefit = Benefit::find($benefit);
+        $price = PriceList::find($priceList);
 
-        if (! $benefit) {
+        if(! $price) {
             return response()->json([
                 'data' => null,
                 'status' => 'error',
-                'message' => 'Invalid token entered'
+                'message' => 'Invalid token'
             ], 422);
         }
 
         return response()->json([
-            'data' => new BenefitResource($benefit),
+            'data' => new PriceListResource($price),
             'status' => 'success',
-            'message' => 'Benefit details'
+            'message' => 'Price Details'
         ], 200);
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\Benefit  $benefit
+     * @param  \App\Models\PriceList  $priceList
      * @return \Illuminate\Http\JsonResponse
      */
-    public function edit($benefit)
+    public function edit($priceList)
     {
-        $benefit = Benefit::find($benefit);
+        $price = PriceList::find($priceList);
 
-        if (! $benefit) {
+        if(! $price) {
             return response()->json([
                 'data' => null,
                 'status' => 'error',
-                'message' => 'Invalid token entered'
+                'message' => 'Invalid token'
             ], 422);
         }
 
         return response()->json([
-            'data' => new BenefitResource($benefit),
+            'data' => new PriceListResource($price),
             'status' => 'success',
-            'message' => 'Benefit details'
+            'message' => 'Price Details'
         ], 200);
     }
 
@@ -140,15 +168,14 @@ class BenefitController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Benefit  $benefit
+     * @param  \App\Models\PriceList  $priceList
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request, $benefit)
+    public function update(Request $request, $priceList)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'parentId' => 'required',
-            'numOfDays' => 'required'
+            'benefit_id' => 'required|integer',
+            'amount' => 'required|integer'
         ]);
 
         if ($validator->fails()) {
@@ -159,58 +186,54 @@ class BenefitController extends Controller
             ], 500);
         }
 
-        $benefit = Benefit::find($benefit);
+        $price = PriceList::find($priceList);
+        $benefit = Benefit::find($request->benefit_id);
 
-        if (! $benefit) {
+        if(! $price || ! $benefit) {
             return response()->json([
                 'data' => null,
                 'status' => 'error',
-                'message' => 'Invalid token entered'
+                'message' => 'Invalid token'
             ], 422);
         }
 
-        $benefit->update([
-            'name' => $request->name,
-            'label' => Str::slug($request->name),
-            'description' => $request->description,
-            'parentId' => $request->parentId,
-            'numOfDays' => $request->numOfDays,
-            'notActive' => $request->notActive
+        $price->update([
+            'benefit_id' => $request->benefit_id,
+            'amount' => $request->amount
         ]);
 
         return response()->json([
-            'data' => new BenefitResource($benefit),
+            'data' => new PriceListResource($price),
             'status' => 'success',
-            'message' => 'Benefit updated successfully!'
+            'message' => 'Price updated successfully!'
         ], 200);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Benefit  $benefit
+     * @param  \App\Models\PriceList  $priceList
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy($benefit)
+    public function destroy($priceList)
     {
-        $benefit = Benefit::find($benefit);
+        $price = PriceList::find($priceList);
 
-        if (! $benefit) {
+        if(! $price) {
             return response()->json([
                 'data' => null,
                 'status' => 'error',
-                'message' => 'Invalid token entered'
+                'message' => 'Invalid token'
             ], 422);
         }
 
-        $old = $benefit;
-
-        $benefit->delete();
+        $old = $price;
+        $price->delete();
 
         return response()->json([
             'data' => $old,
             'status' => 'success',
-            'message' => 'Benefit deleted successfully!'
+            'message' => 'Price deleted successfully!'
         ], 200);
     }
 }

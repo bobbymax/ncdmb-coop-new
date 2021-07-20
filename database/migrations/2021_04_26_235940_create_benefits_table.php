@@ -16,6 +16,7 @@ class CreateBenefitsTable extends Migration
         Schema::create('benefits', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('parentId')->default(0);
+            $table->boolean('numOfDays')->default(false);
             $table->string('name');
             $table->string('label')->unique();
             $table->text('description')->nullable();

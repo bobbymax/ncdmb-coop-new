@@ -47,6 +47,7 @@ class AuthApiController extends Controller
 
         return response()->json([
             'message' => 'Login Successful',
+            'status' => 'success',
             'data' => [
                 'token' => $token,
                 'user' => new UserResource(Auth::user()),

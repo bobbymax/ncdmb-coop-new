@@ -25,7 +25,7 @@ class GradeLevelController extends Controller
 
         if ($gradeLevels->count() < 1) {
             return response()->json([
-                'data' => null,
+                'data' => [],
                 'status' => 'info',
                 'message' => 'No data found!'
             ], 200);
@@ -195,10 +195,11 @@ class GradeLevelController extends Controller
             ], 422);
         }
 
+        $old = $gradeLevel;
         $gradeLevel->delete();
 
         return response()->json([
-            'data' => null,
+            'data' => $old,
             'status' => 'success',
             'message' => 'Grade Level deleted successfully!'
         ], 200);

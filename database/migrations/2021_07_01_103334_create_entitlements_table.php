@@ -19,7 +19,8 @@ class CreateEntitlementsTable extends Migration
             $table->foreign('grade_level_id')->references('id')->on('grade_levels')->onDelete('cascade');
             $table->bigInteger('benefit_id')->unsigned();
             $table->foreign('benefit_id')->references('id')->on('benefits')->onDelete('cascade');
-            $table->decimal('amount', $precision = 30, $scale = 2)->default(0);
+            $table->bigInteger('price_list_id')->unsigned();
+            $table->foreign('price_list_id')->references('id')->on('price_lists')->onDelete('cascade');
             $table->timestamps();
         });
     }

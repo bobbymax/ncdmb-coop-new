@@ -25,7 +25,7 @@ class ClaimController extends Controller
 
         if ($claims->count() < 1) {
             return response()->json([
-                'data' => null,
+                'data' => [],
                 'status' => 'info',
                 'message' => 'You do not have any claims registered!'
             ], 200);
@@ -72,7 +72,8 @@ class ClaimController extends Controller
         $claim = Claim::create([
             'title' => $request->title,
             'reference_no' => Str::random(8),
-            'type' => $request->type
+            'type' => $request->type,
+            'user_id' => auth()->user()->id
         ]);
 
         return response()->json([
@@ -192,10 +193,11 @@ class ClaimController extends Controller
             ], 422);
         }
 
+        $old = $claim;
         $claim->delete();
 
         return response()->json([
-            'data' => null,
+            'data' => $old,
             'status' => 'success',
             'message' => 'Claim details deleted successfully'
         ], 200);

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\ModuleResource;
+use App\Models\Department;
 use App\Models\Group;
 use App\Models\Module;
 use App\Models\Role;
@@ -23,7 +24,7 @@ class ModuleController extends Controller
 
         if ($modules->count() < 1) {
             return response()->json([
-                'data' => null,
+                'data' => [],
                 'status' => 'info',
                 'message' => 'No data found'
             ], 200);
@@ -40,8 +41,12 @@ class ModuleController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'label' => 'required|string|max:255|unique:modules',
-            'parentId' => 'required'
+            'path' => 'required|string',
+            'component' => 'required|string|unique:modules',
+            'isAuthRequired' => 'required',
+            'generatePermissions' => 'required',
+            'parentId' => 'required',
+            'isAdministration' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -55,9 +60,12 @@ class ModuleController extends Controller
         $module = Module::create([
             'name' => $request->name,
             'label' => Str::slug($request->name),
+            'path' => $request->path,
+            'component' => $request->component,
             'icon' => $request->icon,
             'parentId' => $request->parentId,
             'generatePermissions' => $request->generatePermissions,
+            'isAuthRequired' => $request->isAuthRequired,
             'isMenu' => $request->isMenu,
             'isAdministration' => $request->isAdministration
         ]);
@@ -72,6 +80,30 @@ class ModuleController extends Controller
                 }
             }
 
+        }
+
+        if ($request->has('departments')) {
+            $currentDepartments = $module->departments->pluck('id')->toArray();
+
+            foreach($request->departments as $department) {
+                $dept = Department::find($department['value']);
+
+                if ($dept && ! in_array($dept->id, $currentDepartments)) {
+                    $module->departments()->save($dept);
+                }
+            }
+        }
+
+        if ($request->has('roles')) {
+            $currentRoles = $module->roles->pluck('id')->toArray();
+
+            foreach($request->roles as $role) {
+                $r = Role::find($role['value']);
+
+                if ($r && ! in_array($r->id, $currentRoles)) {
+                    $module->roles()->save($r);
+                }
+            }
         }
 
         return response()->json([
@@ -201,7 +233,9 @@ class ModuleController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'label' => 'required|string|max:255',
+            'path' => 'required|string',
+            'component' => 'required|string',
+            'isAuthRequired' => 'required',
             'parentId' => 'required'
         ]);
 
@@ -226,11 +260,38 @@ class ModuleController extends Controller
         $module->update([
             'name' => $request->name,
             'label' => Str::slug($request->name),
+            'path' => $request->path,
+            'component' => $request->component,
             'icon' => $request->icon,
             'parentId' => $request->parentId,
+            'isAuthRequired' => $request->isAuthRequired,
             'isMenu' => $request->isMenu,
             'isAdministration' => $request->isAdministration
         ]);
+
+        if ($request->has('departments')) {
+            $currentDepartments = $module->departments->pluck('id')->toArray();
+
+            foreach($request->departments as $department) {
+                $dept = Department::find($department['value']);
+
+                if ($dept && ! in_array($dept->id, $currentDepartments)) {
+                    $module->departments()->save($dept);
+                }
+            }
+        }
+
+        if ($request->has('roles')) {
+            $currentRoles = $module->roles->pluck('id')->toArray();
+
+            foreach($request->roles as $role) {
+                $r = Role::find($role['value']);
+
+                if ($r && ! in_array($r->id, $currentRoles)) {
+                    $module->roles()->save($r);
+                }
+            }
+        }
 
         return response()->json([
             'data' => new ModuleResource($module),

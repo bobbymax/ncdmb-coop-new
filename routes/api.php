@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(['middleware' => ['cors', 'json.response']], function () {
     Route::post('login', 'AuthApiController@login');
+    Route::get('entitlements/dependencies', 'EntitlementController@getEntitlementDependencies');
+    Route::post('load/entitlements', 'EntitlementController@saveBatchEntitlements');
+    Route::get('load/wages/dependencies', 'PriceListController@getDependencies');
 
     // Configuration Routes
     Route::get('get/models', 'ConfigurationController@fetchModels');
@@ -20,10 +23,14 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
 
     // Budget Control
     Route::apiResource('budgetHeads', 'BudgetHeadController');
+    Route::post('budgetHeads/import', 'BudgetHeadController@importedBudgetHeads');
+    Route::get('budget/dependencies', 'SubBudgetHeadController@getDependencies');
     Route::apiResource('subBudgetHeads', 'SubBudgetHeadController');
     Route::apiResource('creditBudgetHeads', 'CreditBudgetHeadController');
+    Route::post('fundSubBudget', 'CreditBudgetHeadController@addFundToSubBudgetHead');
     Route::apiResource('expenditures', 'ExpenditureController');
     Route::apiResource('batches', 'BatchController');
+    Route::apiResource('priceLists', 'PriceListController');
 
     // Staff Structure
     Route::apiResource('gradeLevels', 'GradeLevelController');

@@ -15,4 +15,19 @@ class Benefit extends Model
     {
         return $this->hasMany(Entitlement::class);
     }
+
+    public function prices()
+    {
+        return $this->hasMany(PriceList::class);
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(Benefit::class, 'parentId');
+    }
+
+    public function children()
+    {
+        return $this->hasMany(Benefit::class, 'parentId');
+    }
 }

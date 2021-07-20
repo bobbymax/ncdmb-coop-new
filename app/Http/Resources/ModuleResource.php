@@ -18,13 +18,17 @@ class ModuleResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'icon' => $this->icon,
+            'icon' => $this->icon ?? "",
+            'path' => $this->path ?? "",
+            'component' => $this->component ?? "",
             'parentId' => $this->parentId,
             'parent' => $this->parentId != 0 ? $this->parent->name : 'None',
+            'isAuthRequired' => $this->isAuthRequired,
             'isAdministration' => $this->isAdministration,
             'isMenu' => $this->isMenu,
             'roles' => $this->roles,
-            'permissions' => $this->generatePermissions ? $this->permissions : 'No Permissions'
+            'departments' => $this->departments,
+            'permissions' => $this->generatePermissions ? $this->permissions : []
         ];
     }
 }

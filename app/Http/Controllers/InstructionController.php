@@ -26,7 +26,7 @@ class InstructionController extends Controller
 
         if (! $claim) {
             return response()->json([
-                'data' => null,
+                'data' => [],
                 'status' => 'error',
                 'message' => 'Invalid token chosen'
             ], 422);
@@ -70,7 +70,7 @@ class InstructionController extends Controller
             'from' => 'required|date',
             'to' => 'required|date',
             'description' => 'required|min:3',
-            'amount' => 'required|integer',
+            'amount' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -94,7 +94,7 @@ class InstructionController extends Controller
         $instruction = new Instruction;
 
         $instruction->benefit_id = $request->benefit_id;
-        $instruction->additional_benefit = isset($request->additional_benefit) ? $request->additional_benefit : null;
+        $instruction->additional_benefit_id = $request->category;
         $instruction->from = Carbon::parse($request->from);
         $instruction->to = Carbon::parse($request->to);
         $instruction->description = $request->description;
@@ -103,7 +103,7 @@ class InstructionController extends Controller
         $claim->instructions()->save($instruction);
 
         return response()->json([
-            'data' => $claim->instructions,
+            'data' => $instruction,
             'status' => 'success',
             'message' => 'Instruction details created successfully!'
         ], 201);
@@ -138,7 +138,7 @@ class InstructionController extends Controller
         }
 
         return response()->json([
-            'data' => $claim->instructions,
+            'data' => $instruction,
             'status' => 'success',
             'message' => 'Instruction details'
         ], 200);
@@ -174,7 +174,7 @@ class InstructionController extends Controller
         }
 
         return response()->json([
-            'data' => $claim->instructions,
+            'data' => $instruction,
             'status' => 'success',
             'message' => 'Instruction details'
         ], 200);
@@ -194,7 +194,7 @@ class InstructionController extends Controller
             'from' => 'required|date',
             'to' => 'required|date',
             'description' => 'required|min:3',
-            'amount' => 'required|integer',
+            'amount' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -226,7 +226,7 @@ class InstructionController extends Controller
         }
 
         $instruction->benefit_id = $request->benefit_id;
-        $instruction->additional_benefit = isset($request->additional_benefit) ? $request->additional_benefit : null;
+        $instruction->additional_benefit_id = $request->category;
         $instruction->from = Carbon::parse($request->from);
         $instruction->to = Carbon::parse($request->to);
         $instruction->description = $request->description;
@@ -235,7 +235,7 @@ class InstructionController extends Controller
         $claim->instructions()->save($instruction);
 
         return response()->json([
-            'data' => $claim->instructions,
+            'data' => $instruction,
             'status' => 'success',
             'message' => 'Instruction details updated successfully!'
         ], 200);
@@ -269,10 +269,11 @@ class InstructionController extends Controller
             ], 422);
         }
 
+        $old = $instruction;
         $instruction->delete();
 
         return response()->json([
-            'data' => $claim->instructions,
+            'data' => $old,
             'status' => 'success',
             'message' => 'Instruction details deleted successfully!'
         ], 200);

@@ -17,11 +17,13 @@ class User extends Authenticatable
      *
      * @var array
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+//    protected $fillable = [
+//        'name',
+//        'email',
+//        'password',
+//    ];
+
+    protected $guarded = [''];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -72,6 +74,21 @@ class User extends Authenticatable
         return $this->morphedByMany(Department::class, 'userable');
     }
 
+    public function currentDepartments()
+    {
+        return $this->departments->pluck('id')->toArray();
+    }
+
+    public function currentRoles()
+    {
+        return $this->roles->pluck('id')->toArray();
+    }
+
+    public function gradeLevel()
+    {
+        return $this->belongsTo(GradeLevel::class);
+    }
+
     public function groups()
     {
         return $this->morphedByMany(Group::class, 'userable');
@@ -80,5 +97,20 @@ class User extends Authenticatable
     public function addDepartment(Department $department)
     {
         return $this->departments()->save($department);
+    }
+
+    public function hasRole($role)
+    {
+        if (is_string($role)) {
+            return $this->roles->contains('label', $role);
+        }
+
+        foreach ($role as $r) {
+            if ($this->hasRole($r->label)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\SubBudgetHeadResource;
 use App\Models\SubBudgetHead;
+use App\Models\Department;
+use App\Models\BudgetHead;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -25,14 +28,14 @@ class SubBudgetHeadController extends Controller
 
         if ($subBudgetHeads->count() < 1) {
             return response()->json([
-                'data' => null,
+                'data' => [],
                 'status' => 'info',
                 'message' => 'No data found!'
             ], 200);
         }
 
         return response()->json([
-            'data' => $subBudgetHeads,
+            'data' => SubBudgetHeadResource::collection($subBudgetHeads),
             'status' => 'success',
             'message' => 'Sub-Budget List'
         ], 200);
@@ -82,11 +85,11 @@ class SubBudgetHeadController extends Controller
             'label' => Str::slug($request->name),
             'description' => $request->description,
             'type' => $request->type,
-            'logisticsBudget' => $request->logisticsBudget == "on"
+            'logisticsBudget' => $request->logisticsBudget
         ]);
 
         return response()->json([
-            'data' => $subBudgetHead,
+            'data' => new SubBudgetHeadResource($subBudgetHead),
             'status' => 'success',
             'message' => 'Sub-Budget Head has been created successfully!'
         ], 201);
@@ -111,7 +114,7 @@ class SubBudgetHeadController extends Controller
         }
 
         return response()->json([
-            'data' => $subBudgetHead,
+            'data' => new SubBudgetHeadResource($subBudgetHead),
             'status' => 'success',
             'message' => 'Sub-Budget Head details'
         ], 200);
@@ -136,7 +139,7 @@ class SubBudgetHeadController extends Controller
         }
 
         return response()->json([
-            'data' => $subBudgetHead,
+            'data' => new SubBudgetHeadResource($subBudgetHead),
             'status' => 'success',
             'message' => 'Sub-Budget Head details'
         ], 200);
@@ -154,12 +157,10 @@ class SubBudgetHeadController extends Controller
         $validator = Validator::make($request->all(), [
             'budget_head_id' => 'required|integer',
             'department_id' => 'required|integer',
-            'budgetCode' => 'required|string|max:15|unique:sub_budget_heads',
             'name' => 'required|string',
             'description' => 'required',
             'type' => 'required|string|in:capital,recursive,personnel',
             'logisticsBudget' => 'required',
-            'active' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -188,12 +189,12 @@ class SubBudgetHeadController extends Controller
             'label' => Str::slug($request->name),
             'description' => $request->description,
             'type' => $request->type,
-            'logisticsBudget' => $request->logisticsBudget == "on",
-            'active' => $request->active
+            'logisticsBudget' => $request->logisticsBudget,
+            // 'active' => $request->active
         ]);
 
         return response()->json([
-            'data' => $subBudgetHead,
+            'data' => new SubBudgetHeadResource($subBudgetHead),
             'status' => 'success',
             'message' => 'Sub-Budget Head has been updated successfully!'
         ], 200);
@@ -217,10 +218,12 @@ class SubBudgetHeadController extends Controller
             ], 422);
         }
 
+        $old = $subBudgetHead;
+
         $subBudgetHead->delete();
 
         return response()->json([
-            'data' => null,
+            'data' => $old,
             'status' => 'success',
             'message' => 'Sub-Budget Head deleted successfully'
         ], 200);

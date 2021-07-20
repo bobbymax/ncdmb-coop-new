@@ -23,7 +23,7 @@ class RoleController extends Controller
 
         if ($roles->count() < 1) {
             return response()->json([
-                'data' => null,
+                'data' => [],
                 'status' => 'info',
                 'message' => 'No data found!'
             ], 200);

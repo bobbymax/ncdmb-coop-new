@@ -30,4 +30,19 @@ class Department extends Model
     {
         return $this->hasMany(SubBudgetHead::class);
     }
+
+    public function canAccessModule($module)
+    {
+        if(is_string($module)) {
+            return $this->modules->contains('label', $module);
+        }
+
+        foreach ($module as $m) {
+            if ($this->canAccessModule($m->label)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

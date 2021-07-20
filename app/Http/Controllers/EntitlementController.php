@@ -2,12 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\BenefitResource;
+use App\Http\Resources\EntitlementResource;
+use App\Models\Benefit;
 use App\Models\Entitlement;
+use App\Models\GradeLevel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class EntitlementController extends Controller
 {
+    protected $loadedEntitlements = [];
     public function __construct()
     {
         $this->middleware('auth:api');
@@ -31,7 +36,7 @@ class EntitlementController extends Controller
         }
 
         return response()->json([
-            'data' => $entitlements,
+            'data' => EntitlementResource::collection($entitlements),
             'status' => 'success',
             'message' => 'Entitlements list'
         ], 200);
@@ -45,6 +50,67 @@ class EntitlementController extends Controller
     public function create()
     {
         //
+    }
+
+    public function getEntitlementDependencies()
+    {
+        $gradeLevels = GradeLevel::all();
+        $benefits = Benefit::all();
+
+        $results = compact('gradeLevels', 'benefits');
+
+        return response()->json([
+            'data' => $results,
+            'status' => 'success',
+            'message' => 'Dependencies fetched successfully!'
+        ], 200);
+    }
+
+    public function saveBatchEntitlements(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'benefit_id' => 'required|integer',
+            'price_list_id' => 'required|integer',
+            'grades' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'data' => $validator->errors(),
+                'status' => 'error',
+                'message' => 'Please fix the following errors'
+            ], 500);
+        }
+
+        $benefit = Benefit::find($request->benefit_id);
+
+        if(! $benefit) {
+            return response()->json([
+                'data' => null,
+                'status' => 'error',
+                'message' => 'Invalid token'
+            ], 422);
+        }
+
+        if ($request->has('grades')) {
+            foreach($request->grades as $grade) {
+                $entitlement = Entitlement::create([
+                    'grade_level_id' => $grade['value'],
+                    'benefit_id' => $benefit->id,
+                    'price_list_id' => $request->price_list_id
+                ]);
+
+                $this->loadedEntitlements[] = $entitlement;
+            }
+        }
+
+        // $entitlements = Entitlement::all();
+
+        return response()->json([
+            'data' => new BenefitResource($benefit),
+            'status' => 'success',
+            'message' => 'Entitlement created successfully!'
+        ], 201);
     }
 
     /**
@@ -76,7 +142,7 @@ class EntitlementController extends Controller
         ]);
 
         return response()->json([
-            'data' => $entitlement,
+            'data' => new EntitlementResource($entitlement),
             'status' => 'success',
             'message' => 'Entitlement created successfully!'
         ], 201);
@@ -101,7 +167,7 @@ class EntitlementController extends Controller
         }
 
         return response()->json([
-            'data' => $entitlement,
+            'data' => new EntitlementResource($entitlement),
             'status' => 'success',
             'message' => 'Entitlement list'
         ], 200);
@@ -126,7 +192,7 @@ class EntitlementController extends Controller
         }
 
         return response()->json([
-            'data' => $entitlement,
+            'data' => new EntitlementResource($entitlement),
             'status' => 'success',
             'message' => 'Entitlement list'
         ], 200);
@@ -172,7 +238,7 @@ class EntitlementController extends Controller
         ]);
 
         return response()->json([
-            'data' => $entitlement,
+            'data' => new EntitlementResource($entitlement),
             'status' => 'success',
             'message' => 'Entitlement updated successfully!'
         ], 200);
@@ -196,10 +262,11 @@ class EntitlementController extends Controller
             ], 422);
         }
 
+        $old = $entitlement;
         $entitlement->delete();
 
         return response()->json([
-            'data' => null,
+            'data' => $old,
             'status' => 'success',
             'message' => 'Entitlement deleted successfully!'
         ], 200);

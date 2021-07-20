@@ -27,7 +27,7 @@ class DepartmentController extends Controller
 
         if ($departments->count() < 1) {
             return response()->json([
-                'data' => null,
+                'data' => [],
                 'status' => 'info',
                 'message' => 'No data found'
             ], 200);

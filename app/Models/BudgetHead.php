@@ -15,4 +15,5 @@ class BudgetHead extends Model
     {
         return $this->hasMany(SubBudgetHead::class);
     }
+
 }

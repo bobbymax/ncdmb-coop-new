@@ -9,6 +9,9 @@ use Illuminate\Support\Str;
 
 class BudgetHeadController extends Controller
 {
+
+    protected $importedBudgetHeads = [];
+
     public function __construct()
     {
         $this->middleware('auth:api');
@@ -25,7 +28,7 @@ class BudgetHeadController extends Controller
 
         if ($budgetHeads->count() < 1) {
             return response()->json([
-                'data' => null,
+                'data' => [],
                 'status' => 'info',
                 'message' => 'No data found!'
             ], 200);
@@ -81,6 +84,52 @@ class BudgetHeadController extends Controller
             'message' => 'Budget Head created successfully!'
         ], 201);
     }
+
+    public function importedBudgetHeads(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'budget_heads' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'data' => $validator->errors(),
+                'status' => 'error',
+                'message' => 'Please fix errors'
+            ], 500);
+        }
+
+        if ($request->has('budget_heads')) {
+            foreach($request->budget_heads as $budget) {
+                $this->importedBudgetHeads[] = $this->saveBudgetHead($budget);
+            }
+        }
+
+        if(count($this->importedBudgetHeads) < 1) {
+            return response()->json([
+                'data' => [],
+                'status' => 'error',
+                'entity' => 'BudgetHeads',
+                'message' => 'Nothing was sent to server'
+            ], 422);
+        }
+
+        return response()->json([
+            'data' => BudgetHead::latest()->get(),
+            'status' => 'success',
+            'entity' => 'BudgetHeads',
+            'message' => 'Budget Heads imported successfully!'
+        ], 201);
+    }
+
+    protected function saveBudgetHead(array $data) {
+        return BudgetHead::create([
+            'name' => $data['name'],
+            'label' => Str::slug($data['name']),
+            'budgetId' => $data['ref_no']
+        ]);
+    }
+
 
     /**
      * Display the specified resource.
