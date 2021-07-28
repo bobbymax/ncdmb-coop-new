@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\InstructionResource;
 use App\Models\Claim;
 use App\Models\Instruction;
 use Carbon\Carbon;
@@ -34,14 +35,14 @@ class InstructionController extends Controller
 
         if ($claim->instructions->count() < 1) {
             return response()->json([
-                'data' => null,
+                'data' => [],
                 'status' => 'info',
                 'message' => 'Add new instructions to this claim'
             ], 200);
         }
 
         return response()->json([
-            'data' => $claim->instructions,
+            'data' => InstructionResource::collection($claim->instructions),
             'status' => 'success',
             'message' => 'Instruction details list'
         ], 200);
@@ -103,7 +104,7 @@ class InstructionController extends Controller
         $claim->instructions()->save($instruction);
 
         return response()->json([
-            'data' => $instruction,
+            'data' => new InstructionResource($instruction),
             'status' => 'success',
             'message' => 'Instruction details created successfully!'
         ], 201);
@@ -138,7 +139,7 @@ class InstructionController extends Controller
         }
 
         return response()->json([
-            'data' => $instruction,
+            'data' => new InstructionResource($instruction),
             'status' => 'success',
             'message' => 'Instruction details'
         ], 200);
@@ -174,7 +175,7 @@ class InstructionController extends Controller
         }
 
         return response()->json([
-            'data' => $instruction,
+            'data' => new InstructionResource($instruction),
             'status' => 'success',
             'message' => 'Instruction details'
         ], 200);
@@ -235,7 +236,7 @@ class InstructionController extends Controller
         $claim->instructions()->save($instruction);
 
         return response()->json([
-            'data' => $instruction,
+            'data' => new InstructionResource($instruction),
             'status' => 'success',
             'message' => 'Instruction details updated successfully!'
         ], 200);

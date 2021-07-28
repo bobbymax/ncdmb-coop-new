@@ -20,8 +20,8 @@ class CreateClaimsTable extends Migration
             $table->text('title');
             $table->string('reference_no')->unique();
             $table->decimal('total_amount', $precision = 30, $scale = 2)->default(0);
-            $table->enum('type', ['staff-claim', 'touring-advance'])->default('staff-claim');
-            $table->enum('status', ['pending', 'registered', 'unregistered', 'batched'])->default('pending');
+            $table->enum('type', ['staff-claim', 'touring-advance', 'third-party'])->default('staff-claim');
+            $table->enum('status', ['pending', 'registered', 'unregistered', 'cleared', 'batched', 'queried', 'paid'])->default('pending');
             $table->boolean('paid')->default(false);
             $table->timestamps();
         });

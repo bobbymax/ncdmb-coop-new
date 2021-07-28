@@ -57,10 +57,9 @@ class ExpenditureController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'sub_budget_head_id' => 'required|integer',
-            'beneficiary' => 'required|string|max:255',
-            'description' => 'required|min:3',
-            'payment_type' => 'required|string|in:staff-payment,third-party',
-            'amount' => 'required',
+            'claim_id' => 'required|string|max:255',
+            'status' => 'required|string|in:cleared,batched,queried,paid',
+            'type' => 'required|string|in:staff-claim,third-party,other',
         ]);
 
         if ($validator->fails()) {
@@ -73,21 +72,20 @@ class ExpenditureController extends Controller
 
         $expenditure = Expenditure::create([
             'sub_budget_head_id' => $request->sub_budget_head_id,
-            'reference_no' => isset($request->reference_no) ? $request->reference_no : null,
-            'beneficiary' => $request->beneficiary,
-            'description' => $request->description,
-            'additional_info' => $request->additional_info,
-            'payment_type' => $request->payment_type,
-            'type' => isset($request->type) ? $request->type : "others",
-            'amount' => $request->amount,
+            'claim_id' => $request->claim_id,
+            'user_id' => auth()->user()->id,
+            'type' => $request->type,
+            'status' => $request->status,
+            'additional_info' => $request->additional_info
         ]);
 
         if ($expenditure) {
-            $booked = $expenditure->subBudgetHead->fund->booked_expenditure + $expenditure->amount;
-
-            $expenditure->subBudgetHead->fund->booked_expenditure += $expenditure->amount;
-            $expenditure->subBudgetHead->fund->booked_balance = $expenditure->subBudgetHead->fund->approved_amount - $booked;
+            $expenditure->subBudgetHead->fund->booked_expenditure += $expenditure->claim->total_amount;
+            $expenditure->subBudgetHead->fund->booked_balance -= $expenditure->claim->total_amount;
             $expenditure->subBudgetHead->fund->save();
+
+            $expenditure->claim->status = "cleared";
+            $expenditure->save();
         }
 
         return response()->json([
@@ -158,10 +156,9 @@ class ExpenditureController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'sub_budget_head_id' => 'required|integer',
-            'beneficiary' => 'required|string|max:255',
-            'description' => 'required|min:3',
-            'payment_type' => 'required|string|in:staff-payment,third-party',
-            'amount' => 'required',
+            'claim_id' => 'required|string|max:255',
+            'status' => 'required|string|in:cleared,batched,queried,paid',
+            'type' => 'required|string|in:staff-claim,third-party,other',
         ]);
 
         if ($validator->fails()) {
@@ -178,28 +175,22 @@ class ExpenditureController extends Controller
             return response()->json([
                 'data' => null,
                 'status' => 'error',
-                'message' => 'Invalid ID entered'
+                'message' => 'Invalid token entered'
             ], 422);
         }
 
         $expenditure->update([
             'sub_budget_head_id' => $request->sub_budget_head_id,
-            'reference_no' => isset($request->reference_no) ? $request->reference_no : null,
-            'beneficiary' => $request->beneficiary,
-            'description' => $request->description,
-            'additional_info' => $request->additional_info,
-            'payment_type' => $request->payment_type,
-            'type' => isset($request->type) ? $request->type : "others",
-            'amount' => $request->amount,
+            'claim_id' => $request->claim_id,
+            'user_id' => auth()->user()->id,
+            'type' => $request->type,
+            'status' => $request->status,
+            'additional_info' => $request->additional_info
         ]);
 
-        if ($expenditure) {
-            $booked = $expenditure->subBudgetHead->fund->booked_expenditure + $expenditure->amount;
-
-            $expenditure->subBudgetHead->fund->booked_expenditure += $expenditure->amount;
-            $expenditure->subBudgetHead->fund->booked_balance = $expenditure->subBudgetHead->fund->approved_amount - $booked;
-            $expenditure->subBudgetHead->fund->save();
-        }
+//        $expenditure->subBudgetHead->fund->booked_expenditure += $expenditure->claim->total_amount;
+//        $expenditure->subBudgetHead->fund->booked_balance -= $expenditure->claim->total_amount;
+//        $expenditure->subBudgetHead->fund->save();
 
         return response()->json([
             'data' => $expenditure,

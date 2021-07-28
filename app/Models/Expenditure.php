@@ -21,8 +21,13 @@ class Expenditure extends Model
         return $this->belongsTo(Batch::class, 'batch_id');
     }
 
-    public function owner()
+    public function initiator()
     {
-        return $this->belongsTo(User::class, 'controller_id');
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function claim()
+    {
+        return $this->belongsTo(Claim::class, 'claim_id');
     }
 }

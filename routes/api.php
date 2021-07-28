@@ -28,6 +28,7 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     Route::apiResource('subBudgetHeads', 'SubBudgetHeadController');
     Route::apiResource('creditBudgetHeads', 'CreditBudgetHeadController');
     Route::post('fundSubBudget', 'CreditBudgetHeadController@addFundToSubBudgetHead');
+    Route::post('budget/clear', 'ClaimController@budgetClear');
     Route::apiResource('expenditures', 'ExpenditureController');
     Route::apiResource('batches', 'BatchController');
     Route::apiResource('priceLists', 'PriceListController');
@@ -38,6 +39,7 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     Route::apiResource('entitlements', 'EntitlementController');
     Route::apiResource('claims', 'ClaimController');
     Route::apiResource('claims/{claim}/instructions', 'InstructionController');
+    Route::get('fetch/claims/{claim}', 'ClaimController@fetchClaimByCode');
 
     // Additional Access Control Routes
     Route::post('groups/{group}/staffs', 'GroupController@addStaffsToGroup');

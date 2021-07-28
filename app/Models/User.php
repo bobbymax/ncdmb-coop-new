@@ -69,6 +69,11 @@ class User extends Authenticatable
         return $this->hasMany(Batch::class, 'controller_id');
     }
 
+    public function department()
+    {
+        return $this->belongsTo(Department::class, 'department_id');
+    }
+
     public function departments()
     {
         return $this->morphedByMany(Department::class, 'userable');

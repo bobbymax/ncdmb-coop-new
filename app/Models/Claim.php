@@ -20,4 +20,9 @@ class Claim extends Model
     {
         return $this->morphMany(Instruction::class, 'instructionable');
     }
+
+    public function expenditure()
+    {
+        return $this->hasOne(Expenditure::class);
+    }
 }

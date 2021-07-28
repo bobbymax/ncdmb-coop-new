@@ -77,7 +77,8 @@ class CreditBudgetHeadController extends Controller
             'sub_budget_head_id' => $request->sub_budget_head_id,
             'description' => $request->description,
             'approved_amount' => $request->approved_amount,
-            'actual_balance' => $request->approved_amount
+            'actual_balance' => $request->approved_amount,
+            'booked_balance' => $request->approved_amount
         ]);
 
         return response()->json([
@@ -164,7 +165,8 @@ class CreditBudgetHeadController extends Controller
                 'sub_budget_head_id' => $request->sub_budget_head_id,
                 'description' => $request->description,
                 'approved_amount' => $request->approved_amount + $this->fund->approved_amount,
-                'actual_balance' => $this->fund->actual_balance + $request->approved_amount
+                'actual_balance' => $this->fund->actual_balance + $request->approved_amount,
+                'booked_balance' => $this->fund->booked_balance + $request->approved_amount
             ]);
             $this->status = 200;
         } else {
@@ -220,7 +222,8 @@ class CreditBudgetHeadController extends Controller
             'sub_budget_head_id' => $request->sub_budget_head_id,
             'description' => $request->description,
             'approved_amount' => $creditBudgetHead->approved_amount + $request->approved_amount,
-            'actual_balance' => $creditBudgetHead->actual_balance + $request->approved_amount
+            'actual_balance' => $creditBudgetHead->actual_balance + $request->approved_amount,
+            'booked_balance' => $creditBudgetHead->booked_balance + $request->approved_amount
         ]);
 
         return response()->json([

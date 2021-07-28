@@ -89,6 +89,11 @@ class StaffController extends Controller
             foreach($request->departments as $department) {
                 $dept = Department::find($department['value']);
 
+                if ($dept->type == "department" && $staff->department_id == 0) {
+                    $staff->department_id = $dept->id;
+                    $staff->save();
+                }
+
                 if ($dept) {
                     $staff->departments()->save($dept);
                 }
@@ -207,6 +212,11 @@ class StaffController extends Controller
         if ($request->has('departments')) {
             foreach($request->departments as $department) {
                 $dept = Department::find($department['value']);
+
+                if ($dept->type == "department" && $staff->department_id == 0) {
+                    $staff->department_id = $dept->id;
+                    $staff->save();
+                }
 
                 if ($dept && !in_array($dept->id, $staff->currentDepartments())) {
                     $staff->departments()->save($dept);
