@@ -23,7 +23,7 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
 
     // Budget Control
     Route::apiResource('budgetHeads', 'BudgetHeadController');
-    Route::post('budgetHeads/import', 'BudgetHeadController@importedBudgetHeads');
+    Route::post('budgetHeads/import','BudgetHeadController@importedBudgetHeads');
     Route::get('budget/dependencies', 'SubBudgetHeadController@getDependencies');
     Route::apiResource('subBudgetHeads', 'SubBudgetHeadController');
     Route::apiResource('creditBudgetHeads', 'CreditBudgetHeadController');

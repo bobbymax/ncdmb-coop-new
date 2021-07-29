@@ -57,7 +57,7 @@ class ExpenditureController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'sub_budget_head_id' => 'required|integer',
-            'claim_id' => 'required|string|max:255',
+            'claim_id' => 'required|integer',
             'status' => 'required|string|in:cleared,batched,queried,paid',
             'type' => 'required|string|in:staff-claim,third-party,other',
         ]);
@@ -85,7 +85,7 @@ class ExpenditureController extends Controller
             $expenditure->subBudgetHead->fund->save();
 
             $expenditure->claim->status = "cleared";
-            $expenditure->save();
+            $expenditure->claim->save();
         }
 
         return response()->json([
