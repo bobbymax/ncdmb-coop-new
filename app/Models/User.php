@@ -74,6 +74,16 @@ class User extends Authenticatable
         return $this->belongsTo(Department::class, 'department_id');
     }
 
+    public function division()
+    {
+        return $this->departments->where('type', 'division')->first();
+    }
+
+    public function directorate()
+    {
+        return $this->departments->where('type', 'directorate')->first();
+    }
+
     public function departments()
     {
         return $this->morphedByMany(Department::class, 'userable');

@@ -21,8 +21,13 @@ class SubBudgetHead extends Model
         return $this->belongsTo(Department::class, 'department_id');
     }
 
-    public function fund()
+    public function funds()
     {
-        return $this->hasOne(CreditBudgetHead::class);
+        return $this->hasMany(CreditBudgetHead::class);
+    }
+
+    public function getCurrentFund($year)
+    {
+        return $this->funds->where('budget_year', $year)->first();
     }
 }

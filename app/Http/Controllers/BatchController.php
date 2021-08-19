@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\BatchResource;
+use App\Models\Approval;
 use App\Models\Batch;
 use App\Models\Expenditure;
+use App\Models\SubBudgetHead;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -21,18 +24,18 @@ class BatchController extends Controller
      */
     public function index()
     {
-        $batches = auth()->user()->batched;
+        $batches = Batch::latest()->get();
 
         if ($batches->count() < 1) {
             return response()->json([
-                'data' => null,
+                'data' => [],
                 'status' => 'info',
                 'message' => 'No data found!'
             ], 200);
         }
 
         return response()->json([
-            'data' => $batches,
+            'data' => BatchResource::collection($batches),
             'status' => 'success',
             'message' => 'Batches list'
         ], 200);
@@ -58,7 +61,11 @@ class BatchController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'expenditures' => 'required',
-            'total_amount' => 'required|integer'
+            'amount' => 'required',
+            'batch_no' => 'required|string|unique:batches',
+            'noOfClaim' => 'required|integer',
+            'subBudgetHeadCode' => 'required|string',
+            'steps' => 'required|integer'
         ]);
 
         if ($validator->fails()) {
@@ -70,36 +77,130 @@ class BatchController extends Controller
         }
 
         $batch = Batch::create([
-            'controller_id' => auth()->user()->id,
-            'batch_no' => (new Batch)->batchCode($request->expenditures),
-            'total_amount' => $request->total_amount
+            'user_id' => auth()->user()->id,
+            'batch_no' => $request->batch_no,
+            'amount' => $request->amount,
+            'noOfClaim' => $request->noOfClaim,
+            'subBudgetHeadCode' => $request->subBudgetHeadCode,
+            'steps' => $request->steps,
+            'level' => 'budget-office',
+            'budget' => true
         ]);
 
         if ($batch) {
-            if (! is_array($request->expenditures)) {
-                $expenditure = Expenditure::find($request->expenditures);
-
-                if ($expenditure) {
-                    $expenditure->batch_id = $batch->id;
-                    $expenditure->save();
-                }
-            }
-
             foreach($request->expenditures as $value) {
-                $expenditure = Expenditure::find($value);
+                $expenditure = Expenditure::find($value['id']);
 
                 if ($expenditure) {
                     $expenditure->batch_id = $batch->id;
+                    $expenditure->status = "batched";
                     $expenditure->save();
+
+                    $approval = new Approval;
+                    $approval->user_id = auth()->user()->id;
+                    $expenditure->approval()->save($approval);
+
+                    if ($expenditure->claim_id > 0) {
+                        $expenditure->claim->status = "batched";
+                        $expenditure->claim->save();
+                    }
                 }
             }
         }
 
         return response()->json([
-            'data' => $batch,
+            'data' => new BatchResource($batch),
             'status' => 'success',
             'message' => 'Batch created successfully!'
         ], 201);
+    }
+
+    public function clearPayments(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'level' => 'required|string',
+            'status' => 'required|string',
+            'work_flow' => 'required|string',
+            'batchId' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'data' => $validator->errors(),
+                'status' => 'error',
+                'message' => 'Please fix the following errors!'
+            ], 500);
+        }
+
+        $batch = Batch::find($request->batchId);
+
+        if (! $batch) {
+            return response()->json([
+                'data' => null,
+                'status' => 'error',
+                'message' => 'Invalid ID selected'
+            ], 422);
+        }
+
+        $approval = new Approval;
+        $approval->user_id = auth()->user()->id;
+        $approval->work_flow = $request->work_flow;
+        $approval->level = $request->level;
+        $approval->description = $request->description;
+        $approval->status = $request->status;
+        $batch->approvals()->save($approval);
+
+        $this->processNextStep($batch->id, $approval->level);
+
+        return response()->json([
+            'data' => new BatchResource($batch),
+            'status' => 'success',
+            'message' => 'Batch payment cleared successfully!!'
+        ], 201);
+    }
+
+    protected function processNextStep($batchId, $level)
+    {
+        $batch = Batch::find($batchId);
+        $subBudgetHead = SubBudgetHead::where('budgetCode', $batch->subBudgetHeadCode)->first();
+
+        switch ($level) {
+            case 'treasury' :
+                if ($batch->steps == 2) {
+                    $batch->level = 'audit';
+                    $batch->steps += 1;
+                    $batch->treasury = false;
+                    $batch->audit = true;
+                    $batch->save();
+                } else {
+                    $batch->editable = false;
+                    $batch->closed = true;
+                    $batch->status = 'paid';
+                    $batch->save();
+
+                    $subBudgetHead->getCurrentFund(date('Y'))->booked_expenditure -= $batch->amount;
+                    $subBudgetHead->getCurrentFund(date('Y'))->booked_balance -= $batch->amount;
+                    $subBudgetHead->getCurrentFund(date('Y'))->actual_expenditure += $batch->amount;
+                    $subBudgetHead->getCurrentFund(date('Y'))->actual_balance -= $batch->amount;
+
+                    $subBudgetHead->getCurrentFund(date('Y'))->save();
+                }
+                break;
+            case 'audit' :
+                $batch->level = 'treasury';
+                $batch->steps = 4;
+                $batch->treasury = true;
+                $batch->audit = false;
+                $batch->save();
+                break;
+            default :
+                $batch->level = 'treasury';
+                $batch->steps = 2;
+                $batch->treasury = true;
+                $batch->budget = false;
+                $batch->editable = true;
+                $batch->save();
+        }
     }
 
     /**
@@ -110,7 +211,7 @@ class BatchController extends Controller
      */
     public function show($batch)
     {
-        $batch = Batch::find($batch);
+        $batch = Batch::where('batch_no', $batch)->first();
 
         if (! $batch) {
             return response()->json([
@@ -121,7 +222,7 @@ class BatchController extends Controller
         }
 
         return response()->json([
-            'data' => $batch,
+            'data' => new BatchResource($batch),
             'status' => 'success',
             'message' => 'Batch details'
         ], 200);
@@ -135,7 +236,7 @@ class BatchController extends Controller
      */
     public function edit($batch)
     {
-        $batch = Batch::find($batch);
+        $batch = Batch::where('batch_no', $batch)->first();
 
         if (! $batch) {
             return response()->json([
@@ -146,7 +247,7 @@ class BatchController extends Controller
         }
 
         return response()->json([
-            'data' => $batch,
+            'data' => new BatchResource($batch),
             'status' => 'success',
             'message' => 'Batch details'
         ], 200);

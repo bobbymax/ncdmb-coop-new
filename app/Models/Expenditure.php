@@ -30,4 +30,9 @@ class Expenditure extends Model
     {
         return $this->belongsTo(Claim::class, 'claim_id');
     }
+
+    public function approval()
+    {
+        return $this->morphOne(Approval::class, 'approveable');
+    }
 }

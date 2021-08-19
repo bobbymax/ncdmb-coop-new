@@ -36,4 +36,9 @@ class Role extends Model
     {
         return $this->permissions()->save($permission);
     }
+
+    public function canPerform()
+    {
+        return $this->hasMany(Procedure::class);
+    }
 }

@@ -17,9 +17,19 @@ class Batch extends Model
         return $this->hasMany(Expenditure::class);
     }
 
+    public function initiator()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
     public function generatedBy()
     {
         return $this->belongsTo(User::class, 'controller_id');
+    }
+
+    public function approvals()
+    {
+        return $this->morphMany(Approval::class, 'approveable');
     }
 
     private function generateBatchNo($exps)

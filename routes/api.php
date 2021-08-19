@@ -20,6 +20,9 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     Route::apiResource('departments', 'DepartmentController');
     Route::apiResource('groups', 'GroupController');
     Route::apiResource('users', 'StaffController');
+    Route::apiResource('workFlows', 'WorkFlowController');
+    Route::apiResource('procedures', 'ProcedureController');
+    Route::apiResource('approvals', 'ApprovalController');
 
     // Budget Control
     Route::apiResource('budgetHeads', 'BudgetHeadController');
@@ -27,11 +30,12 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     Route::get('budget/dependencies', 'SubBudgetHeadController@getDependencies');
     Route::apiResource('subBudgetHeads', 'SubBudgetHeadController');
     Route::apiResource('creditBudgetHeads', 'CreditBudgetHeadController');
-    Route::post('fundSubBudget', 'CreditBudgetHeadController@addFundToSubBudgetHead');
     Route::post('budget/clear', 'ClaimController@budgetClear');
     Route::apiResource('expenditures', 'ExpenditureController');
     Route::apiResource('batches', 'BatchController');
     Route::apiResource('priceLists', 'PriceListController');
+    Route::patch('batch/expenditures/{expenditure}', 'ExpenditureController@batchExpenditureUpdate');
+    Route::post('clear/payments', 'BatchController@clearPayments');
 
     // Staff Structure
     Route::apiResource('gradeLevels', 'GradeLevelController');

@@ -18,6 +18,7 @@ class ModuleResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'label' => $this->label,
             'icon' => $this->icon ?? "",
             'path' => $this->path ?? "",
             'component' => $this->component ?? "",
@@ -28,7 +29,8 @@ class ModuleResource extends JsonResource
             'isMenu' => $this->isMenu,
             'roles' => $this->roles,
             'departments' => $this->departments,
-            'permissions' => $this->generatePermissions ? $this->permissions : []
+            'permissions' => $this->generatePermissions ? $this->permissions : [],
+            'children' => ModuleResource::collection($this->children)
         ];
     }
 }

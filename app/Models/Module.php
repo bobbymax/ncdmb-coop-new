@@ -40,6 +40,11 @@ class Module extends Model
         return $this->belongsTo(Module::class, 'parentId');
     }
 
+    public function children()
+    {
+        return $this->hasMany(Module::class, 'parentId');
+    }
+
     public function permissions()
     {
         return $this->morphToMany(Permission::class, 'permissionable');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\CreditBudgetHeadResource;
 use App\Http\Resources\SubBudgetHeadResource;
 use App\Models\CreditBudgetHead;
 use Illuminate\Http\Request;
@@ -24,7 +25,7 @@ class CreditBudgetHeadController extends Controller
      */
     public function index()
     {
-        $credits = CreditBudgetHead::all();
+        $credits = CreditBudgetHead::latest()->get();
 
         if ($credits->count() < 1) {
             return response()->json([
@@ -35,7 +36,7 @@ class CreditBudgetHeadController extends Controller
         }
 
         return response()->json([
-            'data' => $credits,
+            'data' => CreditBudgetHeadResource::collection($credits),
             'status' => 'success',
             'message' => 'Sub-Budget Credit Lists'
         ], 200);
@@ -78,11 +79,12 @@ class CreditBudgetHeadController extends Controller
             'description' => $request->description,
             'approved_amount' => $request->approved_amount,
             'actual_balance' => $request->approved_amount,
-            'booked_balance' => $request->approved_amount
+            'booked_balance' => $request->approved_amount,
+            'budget_year' => date('Y')
         ]);
 
         return response()->json([
-            'data' => new SubBudgetHeadResource($credit->subBudgetHead),
+            'data' => new CreditBudgetHeadResource($credit),
             'status' => 'success',
             'message' => 'Funds have been added to this Sub-Budget successfully!'
         ], 201);
@@ -105,7 +107,7 @@ class CreditBudgetHeadController extends Controller
             ], 422);
         }
         return response()->json([
-            'data' => $creditBudgetHead,
+            'data' => new CreditBudgetHeadResource($creditBudgetHead),
             'status' => 'success',
             'message' => 'Sub-Budget details'
         ], 200);
@@ -128,62 +130,10 @@ class CreditBudgetHeadController extends Controller
             ], 422);
         }
         return response()->json([
-            'data' => $creditBudgetHead,
+            'data' => new CreditBudgetHeadResource($creditBudgetHead),
             'status' => 'success',
             'message' => 'Sub-Budget details'
         ], 200);
-    }
-
-    public function addFundToSubBudgetHead(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'sub_budget_head_id' => 'required|integer',
-            'description' => 'required',
-            'approved_amount' => 'required|integer'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'data' => $validator->errors(),
-                'status' => 'error',
-                'message' => 'Please fix the following errors:'
-            ], 500);
-        }
-
-        if ($request->fund_id > 0) {
-            $this->fund = CreditBudgetHead::find($request->fund_id);
-
-            if (! $this->fund) {
-                return response()->json([
-                    'data' => null,
-                    'status' => 'error',
-                    'message' => 'Invalid ID entered'
-                ], 422);
-            }
-
-            $this->fund->update([
-                'sub_budget_head_id' => $request->sub_budget_head_id,
-                'description' => $request->description,
-                'approved_amount' => $request->approved_amount + $this->fund->approved_amount,
-                'actual_balance' => $this->fund->actual_balance + $request->approved_amount,
-                'booked_balance' => $this->fund->booked_balance + $request->approved_amount
-            ]);
-            $this->status = 200;
-        } else {
-            $this->fund = CreditBudgetHead::create([
-                'sub_budget_head_id' => $request->sub_budget_head_id,
-                'description' => $request->description,
-                'approved_amount' => $request->approved_amount,
-                'actual_balance' => $request->approved_amount
-            ]);
-            $this->status = 201;
-        }
-
-        return response()->json([
-            'data' => $this->fund,
-            'status' => 'success',
-            'message' => 'Funds have been added to this Sub-Budget successfully!'
-        ], $this->status);
     }
 
     /**
@@ -218,16 +168,23 @@ class CreditBudgetHeadController extends Controller
                 'message' => 'Invalid ID entered'
             ], 422);
         }
+
+//        $creditBudgetHead->update([
+//            'description' => $request->description,
+//            'approved_amount' => $creditBudgetHead->approved_amount + $request->approved_amount,
+//            'actual_balance' => $creditBudgetHead->actual_balance + $request->approved_amount,
+//            'booked_balance' => $creditBudgetHead->booked_balance + $request->approved_amount
+//        ]);
+
         $creditBudgetHead->update([
-            'sub_budget_head_id' => $request->sub_budget_head_id,
             'description' => $request->description,
-            'approved_amount' => $creditBudgetHead->approved_amount + $request->approved_amount,
-            'actual_balance' => $creditBudgetHead->actual_balance + $request->approved_amount,
-            'booked_balance' => $creditBudgetHead->booked_balance + $request->approved_amount
+            'approved_amount' => $request->approved_amount,
+            'actual_balance' => $request->approved_amount,
+            'booked_balance' => $request->approved_amount
         ]);
 
         return response()->json([
-            'data' => new SubBudgetHeadResource($creditBudgetHead->subBudgetHead),
+            'data' => new CreditBudgetHeadResource($creditBudgetHead),
             'status' => 'success',
             'message' => 'Funds have been updated to this Sub-Budget successfully!'
         ], 200);
@@ -250,10 +207,11 @@ class CreditBudgetHeadController extends Controller
                 'message' => 'Invalid ID entered'
             ], 422);
         }
+        $old = $creditBudgetHead;
         $creditBudgetHead->delete();
 
         return response()->json([
-            'data' => null,
+            'data' => $old,
             'status' => 'success',
             'message' => 'Sub-Budget funds deleted successfully!'
         ], 200);

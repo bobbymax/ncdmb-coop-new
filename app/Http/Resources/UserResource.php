@@ -26,6 +26,7 @@ class UserResource extends JsonResource
             'level' => $this->gradeLevel ? $this->gradeLevel->code : "Not Set",
             'roles' => $this->roles,
             'department' => $this->department_id > 0 ? $this->department : 0,
+            'originator' => $this->department && $this->department->parentId > 0 ? $this->department->parent : null,
             'departments' => $this->departments,
             'administrator' => $this->isAdministrator,
             'modules' => $this->getModules()

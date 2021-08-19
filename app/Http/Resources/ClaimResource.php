@@ -14,7 +14,6 @@ class ClaimResource extends JsonResource
      */
     public function toArray($request)
     {
-        // return parent::toArray($request);
         return [
             'id' => $this->id,
             'reference_no' => $this->reference_no,

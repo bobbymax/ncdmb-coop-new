@@ -115,7 +115,7 @@ class ModuleController extends Controller
 
     public function edit($module)
     {
-        $module = Module::find($module);
+        $module = Module::where('label', $module)->first();
 
         if (! $module) {
             return response()->json([
@@ -134,7 +134,7 @@ class ModuleController extends Controller
 
     public function show($module)
     {
-        $module = Module::find($module);
+        $module = Module::where('label', $module)->first();
 
         if (! $module) {
             return response()->json([

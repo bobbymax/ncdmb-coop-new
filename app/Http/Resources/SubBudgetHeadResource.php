@@ -14,6 +14,7 @@ class SubBudgetHeadResource extends JsonResource
      */
     public function toArray($request)
     {
+        $year = date('Y');
         // return parent::toArray($request);
         return [
             'id' => $this->id,
@@ -26,7 +27,8 @@ class SubBudgetHeadResource extends JsonResource
             'logisticsBudget' => $this->logisticsBudget,
             'department' => $this->department,
             'budgetHead' => $this->budgetHead,
-            'fund' => $this->fund,
+            'fund' => $this->getCurrentFund($year),
+            'funds' => $this->funds,
             'balance' => $this->fund ? $this->fund->actual_balance : 0
         ];
     }

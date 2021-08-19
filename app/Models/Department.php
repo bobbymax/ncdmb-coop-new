@@ -21,6 +21,11 @@ class Department extends Model
         return $this->morphToMany(User::class, 'userable');
     }
 
+    public function parent()
+    {
+        return $this->belongsTo(Department::class, 'parentId');
+    }
+
     public function grantModuleAccess(Module $module)
     {
         return $this->modules()->save($module);
