@@ -109,6 +109,11 @@ class User extends Authenticatable
         return $this->morphedByMany(Group::class, 'userable');
     }
 
+    public function refunds()
+    {
+        return $this->hasMany(Refund::class);
+    }
+
     public function addDepartment(Department $department)
     {
         return $this->departments()->save($department);

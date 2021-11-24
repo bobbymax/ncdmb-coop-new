@@ -30,4 +30,9 @@ class SubBudgetHead extends Model
     {
         return $this->funds->where('budget_year', $year)->first();
     }
+
+    public function refunds()
+    {
+        return $this->hasMany(Refund::class);
+    }
 }

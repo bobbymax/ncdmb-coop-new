@@ -23,7 +23,7 @@ class DepartmentController extends Controller
      */
     public function index()
     {
-        $departments = Department::all();
+        $departments = Department::latest()->get();
 
         if ($departments->count() < 1) {
             return response()->json([

@@ -24,7 +24,7 @@ class GroupController extends Controller
      */
     public function index()
     {
-        $groups = Group::all();
+        $groups = Group::latest()->get();
 
         if ($groups->count() < 1) {
             return response()->json([

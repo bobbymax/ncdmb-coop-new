@@ -7,6 +7,7 @@ use App\Models\Approval;
 use App\Models\Batch;
 use App\Models\Expenditure;
 use App\Models\SubBudgetHead;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -178,8 +179,8 @@ class BatchController extends Controller
                     $batch->status = 'paid';
                     $batch->save();
 
-                    $subBudgetHead->getCurrentFund(date('Y'))->booked_expenditure -= $batch->amount;
-                    $subBudgetHead->getCurrentFund(date('Y'))->booked_balance -= $batch->amount;
+                    // $subBudgetHead->getCurrentFund(date('Y'))->booked_expenditure -= $batch->amount;
+                    // $subBudgetHead->getCurrentFund(date('Y'))->booked_balance -= $batch->amount;
                     $subBudgetHead->getCurrentFund(date('Y'))->actual_expenditure += $batch->amount;
                     $subBudgetHead->getCurrentFund(date('Y'))->actual_balance -= $batch->amount;
 
@@ -225,6 +226,46 @@ class BatchController extends Controller
             'data' => new BatchResource($batch),
             'status' => 'success',
             'message' => 'Batch details'
+        ], 200);
+    }
+
+    public function fetchBatchForReversal($batch)
+    {
+        // 1. Check for batch in database.
+        $batch = Batch::where('batch_no', $batch)->first();
+        if (! $batch) {
+            return response()->json([
+                'data' => null,
+                'status' => 'error',
+                'message' => 'Invalid ID selected'
+            ], 422);
+        }
+        // 2. Check if batch has been paid or closed!!
+        if ($batch->status === "paid" || $batch->closed) {
+            return response()->json([
+                'data' => null,
+                'status' => 'warning',
+                'message' => 'This batch cannot be reversed because it has been marked as paid!!!'
+            ], 200);
+        }
+
+        // 3. Check time of batch post.
+        $now = Carbon::now('GMT+1');
+        $dt = Carbon::parse($batch->created_at);
+
+        if ($now->diffInHours($dt) >= 24) {
+            return response()->json([
+                'data' => null,
+                'status' => 'warning',
+                'message' => 'This batch can only be reversed by a budget officer!!'
+            ], 200);
+        }
+        // 4. If 24 hours has passed - BCO can make reversal else Budget Officer can make reversal
+
+        return response()->json([
+            'data' => new BatchResource($batch),
+            'status' => 'success',
+            'message' => 'Batch Details!!'
         ], 200);
     }
 

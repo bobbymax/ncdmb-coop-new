@@ -30,7 +30,8 @@ class ExpenditureResource extends JsonResource
             'additional_info' => $this->additional_info,
             'type' => $this->type,
             'payment_type' => $this->payment_type,
-            'status' => $this->status
+            'status' => $this->status,
+            'refunded' => $this->refund
         ];
     }
 }

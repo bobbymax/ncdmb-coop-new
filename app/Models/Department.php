@@ -36,6 +36,11 @@ class Department extends Model
         return $this->hasMany(SubBudgetHead::class);
     }
 
+    public function refunds()
+    {
+        return $this->hasMany(Refund::class);
+    }
+
     public function canAccessModule($module)
     {
         if(is_string($module)) {

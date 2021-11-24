@@ -14,6 +14,12 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     Route::get('get/models', 'ConfigurationController@fetchModels');
     Route::get('get/models/{model}/columns', 'ConfigurationController@getColumns');
 
+    // Imports
+    Route::post('imports', 'ImportController@import');
+    Route::get('budgetSummary', 'BudgetSummaryController@getBudgetOverview');
+    Route::post('getPerformance', 'BudgetSummaryController@chartDisplay');
+    Route::get('departments/{department}/budget/summary', 'BudgetSummaryController@getBudgetSummary');
+
     // Access Control
     Route::apiResource('roles', 'RoleController');
     Route::apiResource('modules', 'ModuleController');
@@ -33,7 +39,9 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     Route::post('budget/clear', 'ClaimController@budgetClear');
     Route::apiResource('expenditures', 'ExpenditureController');
     Route::apiResource('batches', 'BatchController');
+    Route::get('reverse/batches/{batch}', 'BatchController@fetchBatchForReversal');
     Route::apiResource('priceLists', 'PriceListController');
+    Route::apiResource('refunds', 'RefundController');
     Route::patch('batch/expenditures/{expenditure}', 'ExpenditureController@batchExpenditureUpdate');
     Route::post('clear/payments', 'BatchController@clearPayments');
 

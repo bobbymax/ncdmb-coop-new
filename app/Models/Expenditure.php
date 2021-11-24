@@ -35,4 +35,9 @@ class Expenditure extends Model
     {
         return $this->morphOne(Approval::class, 'approveable');
     }
+
+    public function refund()
+    {
+        return $this->hasOne(Refund::class);
+    }
 }

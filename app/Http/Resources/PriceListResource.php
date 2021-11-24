@@ -18,6 +18,7 @@ class PriceListResource extends JsonResource
         return [
             'id' => $this->id,
             'benefit_id' => $this->benefit_id,
+            'benefit_name' => $this->benefit->name,
             'amount' => $this->amount,
             'benefit' => new BenefitResource($this->benefit),
             'created_at' => $this->created_at->format('d F, Y')
