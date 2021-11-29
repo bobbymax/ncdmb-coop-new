@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Resources\DepartmentResource;
 use App\Http\Resources\SubBudgetHeadResource;
 use App\Http\Resources\UserResource;
+use App\Http\Resources\ModuleResource;
 use App\Models\BudgetHead;
 use App\Models\Department;
 use App\Models\Role;
+use App\Models\Module;
 use App\Models\SubBudgetHead;
 use App\Models\CreditBudgetHead;
 use App\Models\User;
@@ -55,6 +57,9 @@ class ImportController extends Controller
             case "sub-budget-heads" :
                 $this->result = $this->subBudgetHeadBulkAdd($request->data);
                 break;
+            case "modules" :
+                $this->result = $this->moduleBulkAdd($request->data);
+                break;
             default :
                 $this->result = [];
                 break;
@@ -89,18 +94,19 @@ class ImportController extends Controller
     protected function subBudgetHeadBulkAdd(array $data)
     {
         foreach ($data as $value) {
-            $subBudgetHead = SubBudgetHead::where('budgetCode', $value['BUDGET CODES'])->first();
+            $subBudgetHead = SubBudgetHead::where('budgetCode', $value['CODES'])->first();
 
             if (! $subBudgetHead) {
-                $budgetHead = BudgetHead::where('budgetId', $value['BUDGET HEAD'])->first();
-                $department = Department::where('code', $value['DEPARTMENT'])->first();
+                $budgetHead = BudgetHead::where('budgetId', $value['BH'])->first();
+                $department = Department::where('code', $value['DEPT'])->first();
 
                 if ($budgetHead && $department) {
                     $subBudgetHead = SubBudgetHead::create([
                         'budget_head_id' => $budgetHead->id,
                         'department_id' => $department->id,
-                        'budgetCode' => $value['BUDGET CODES'],
-                        'name' => $value['SUB-BUDGET HEAD'],
+                        'budgetCode' => $value['CODES'],
+                        'name' => $value['NAME'],
+                        'label' => Str::slug($value['NAME']),
                         'description' => "EMPTY VALUE",
                         'type' => "capital",
                         'active' => true
@@ -108,10 +114,10 @@ class ImportController extends Controller
 
                     $fund = CreditBudgetHead::create([
                         'sub_budget_head_id' => $subBudgetHead->id,
-                        'description' => 'EMPTY VALUE',
-                        'approved_amount' => $value['APPROVED AMOUNT'],
-                        'booked_balance' => $value['APPROVED AMOUNT'],
-                        'actual_balance' => $value['APPROVED AMOUNT'],
+                        'description' => 'FUNDING',
+                        'approved_amount' => $value['AMOUNT'],
+                        'booked_balance' => $value['AMOUNT'],
+                        'actual_balance' => $value['AMOUNT'],
                         'budget_year' => date('Y')
                     ]);
                 }
@@ -147,6 +153,46 @@ class ImportController extends Controller
         }
 
         return DepartmentResource::collection($this->bulkRecords);
+    }
+
+    protected function moduleBulkAdd(array $data)
+    {
+        foreach($data as $value) {
+            $module_str = Str::slug($value['name']);
+            $module = Module::where('label', $module_str)->first();
+
+            if (! $module) {
+
+                if ($value['parent'] !== "none") {
+                    $this->parent = Module::where('label', $value['parent'])->first();
+                }
+
+                $module = Module::create([
+                    'name' => $value['name'],
+                    'label' => $module_str,
+                    'path' => $value['path'],
+                    'generatePermissions' => $value['generatePermissions'] === "on" ? true : false,
+                    'isAdministration' => $value['isAdministration'],
+                    'type' => $value['type'],
+                    'parentId' => $this->parent ? $this->parent->id : 0
+                ]);
+
+                if ($value['generatePermissions'] === "on") {
+                    foreach ($module->normalizer($module->name) as $value) {
+                        $permission = $module->savePermission($value, $module->name);
+
+                        if ($permission != null) {
+                            $module->addPermission($permission);
+                        }
+                    }
+                }
+
+            }
+
+            $this->bulkRecords[] = $module;
+        }
+
+        return ModuleResource::collection($this->bulkRecords);
     }
 
     protected function staffBulkAdd(array $data)

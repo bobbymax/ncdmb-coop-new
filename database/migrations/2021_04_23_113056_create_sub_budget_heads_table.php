@@ -21,7 +21,7 @@ class CreateSubBudgetHeadsTable extends Migration
             $table->foreign('department_id')->references('id')->on('departments')->onDelete('cascade');
             $table->string('budgetCode')->unique();
             $table->string('name');
-            $table->string('label')->unique();
+            $table->string('label');
             $table->text('description')->nullable();
             $table->enum('type', ['capital', 'recursive', 'personnel'])->default('capital');
             $table->boolean('logisticsBudget')->default(false);

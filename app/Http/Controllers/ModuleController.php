@@ -37,6 +37,25 @@ class ModuleController extends Controller
         ], 200);
     }
 
+    public function fetchApplications()
+    {
+        $modules = Module::where('type', 'application')->latest()->get();
+
+        if ($modules->count() < 1) {
+            return response()->json([
+                'data' => [],
+                'status' => 'info',
+                'message' => 'No data found'
+            ], 200);
+        }
+
+        return response()->json([
+            'data' => ModuleResource::collection($modules),
+            'status' => 'success',
+            'message' => 'Modules List'
+        ], 200);
+    }
+
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -46,7 +65,8 @@ class ModuleController extends Controller
             'isAuthRequired' => 'required',
             'generatePermissions' => 'required',
             'parentId' => 'required',
-            'isAdministration' => 'required'
+            'isAdministration' => 'required',
+            'type' => 'required|string|in:application,module,page'
         ]);
 
         if ($validator->fails()) {
@@ -67,7 +87,8 @@ class ModuleController extends Controller
             'generatePermissions' => $request->generatePermissions,
             'isAuthRequired' => $request->isAuthRequired,
             'isMenu' => $request->isMenu,
-            'isAdministration' => $request->isAdministration
+            'isAdministration' => $request->isAdministration,
+            'type' => $request->type
         ]);
 
         if ($request->generatePermissions) {
@@ -236,7 +257,8 @@ class ModuleController extends Controller
             'path' => 'required|string',
             'component' => 'required|string',
             'isAuthRequired' => 'required',
-            'parentId' => 'required'
+            'parentId' => 'required',
+            'type' => 'required|string|in:application,module,page'
         ]);
 
         if ($validator->fails()) {
@@ -266,7 +288,8 @@ class ModuleController extends Controller
             'parentId' => $request->parentId,
             'isAuthRequired' => $request->isAuthRequired,
             'isMenu' => $request->isMenu,
-            'isAdministration' => $request->isAdministration
+            'isAdministration' => $request->isAdministration,
+            'type' => $request->type
         ]);
 
         if ($request->has('departments')) {

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class DropLabelColumnOnSubBudgetHeasTable extends Migration
+class AddTypeColumnToModulesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class DropLabelColumnOnSubBudgetHeasTable extends Migration
      */
     public function up()
     {
-        Schema::table('sub_budget_heads', function (Blueprint $table) {
-            $table->dropColumn('label');
+        Schema::table('modules', function (Blueprint $table) {
+            $table->enum('type', ['application', 'module', 'page'])->default('application');
         });
     }
 
@@ -25,8 +25,8 @@ class DropLabelColumnOnSubBudgetHeasTable extends Migration
      */
     public function down()
     {
-        Schema::table('sub_budget_heads', function (Blueprint $table) {
-            $table->string('label')->unique()->after('name');
+        Schema::table('modules', function (Blueprint $table) {
+            $table->dropColumn('type');
         });
     }
 }

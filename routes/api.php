@@ -13,6 +13,7 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     // Configuration Routes
     Route::get('get/models', 'ConfigurationController@fetchModels');
     Route::get('get/models/{model}/columns', 'ConfigurationController@getColumns');
+    Route::get('application/modules', 'ModuleController@fetchApplications');
 
     // Imports
     Route::post('imports', 'ImportController@import');

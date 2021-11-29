@@ -29,8 +29,10 @@ class ModuleResource extends JsonResource
             'isMenu' => $this->isMenu,
             'roles' => $this->roles,
             'departments' => $this->departments,
+            'generatePermissions' => $this->generatePermissions,
+            'type' => $this->type,
             'permissions' => $this->generatePermissions ? $this->permissions : [],
-            'children' => ModuleResource::collection($this->children)
+            'children' => $this->children ? ModuleResource::collection($this->children) : []
         ];
     }
 }

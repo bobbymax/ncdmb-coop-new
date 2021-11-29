@@ -21,7 +21,7 @@ class RoleResource extends JsonResource
             'name' => $this->name,
             'label' => $this->label,
             'max_slots' => $this->max_slots,
-            'start_date' => $this->start_date->format('Y-m-d'),
+            'start_date' => $this->start_date !== null ? $this->start_date->format('Y-m-d') : "",
             'expiry_date' => $this->expiry_date ? $this->expiry_date->format('Y-m-d') : "",
             'cannot_expire' => $this->cannot_expire,
             'isSuper' => $this->isSuper,
