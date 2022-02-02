@@ -25,11 +25,13 @@ class UserResource extends JsonResource
             'grade_level_id' => $this->grade_level_id,
             'level' => $this->gradeLevel ? $this->gradeLevel->code : "Not Set",
             'roles' => $this->roles,
+            'department_id' => $this->department_id,
             'department' => $this->department_id > 0 ? $this->department : 0,
             'originator' => $this->department && $this->department->parentId > 0 ? $this->department->parent : null,
             'departments' => $this->departments,
             'administrator' => $this->isAdministrator,
-            'modules' => $this->getModules()
+            'modules' => $this->getModules(),
+            'accessibleModules' => $this->department_id > 0 ? ModuleResource::collection($this->department->modules) : []
         ];
     }
 

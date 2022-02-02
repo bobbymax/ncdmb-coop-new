@@ -77,6 +77,8 @@ class ExpenditureController extends Controller
             ], 500);
         }
 
+        $budgetYear = config('site.budget_year') ?? config('budget.budget_year');
+
         $expenditure = Expenditure::create([
             'sub_budget_head_id' => $request->sub_budget_head_id,
             'claim_id' => $request->claim_id,
@@ -91,9 +93,9 @@ class ExpenditureController extends Controller
         ]);
 
         if ($expenditure) {
-            $expenditure->subBudgetHead->getCurrentFund(date('Y'))->booked_expenditure += $expenditure->amount;
-            $expenditure->subBudgetHead->getCurrentFund(date('Y'))->booked_balance -= $expenditure->amount;
-            $expenditure->subBudgetHead->getCurrentFund(date('Y'))->save();
+            $expenditure->subBudgetHead->getCurrentFund($budgetYear)->booked_expenditure += $expenditure->amount;
+            $expenditure->subBudgetHead->getCurrentFund($budgetYear)->booked_balance -= $expenditure->amount;
+            $expenditure->subBudgetHead->getCurrentFund($budgetYear)->save();
 
             if ($expenditure->claim_id > 0) {
                 $expenditure->claim->status = "cleared";
@@ -180,6 +182,7 @@ class ExpenditureController extends Controller
         }
 
         $expenditure = Expenditure::find($expenditure);
+        $budgetYear = config('site.budget_year') ?? config('budget.budget_year');
 
         if (! $expenditure) {
             return response()->json([
@@ -197,15 +200,15 @@ class ExpenditureController extends Controller
 
         if ($previousAmount > $request->amount) {
             $diff = $previousAmount - $request->amount;
-            $expenditure->subBudgetHead->getCurrentFund(date('Y'))->booked_expenditure -= $diff;
-            $expenditure->subBudgetHead->getCurrentFund(date('Y'))->booked_balance += $diff;
+            $expenditure->subBudgetHead->getCurrentFund($budgetYear)->booked_expenditure -= $diff;
+            $expenditure->subBudgetHead->getCurrentFund($budgetYear)->booked_balance += $diff;
         } else {
             $diff = $request->amount - $previousAmount;
-            $expenditure->subBudgetHead->getCurrentFund(date('Y'))->booked_expenditure += $diff;
-            $expenditure->subBudgetHead->getCurrentFund(date('Y'))->booked_balance -= $diff;
+            $expenditure->subBudgetHead->getCurrentFund($budgetYear)->booked_expenditure += $diff;
+            $expenditure->subBudgetHead->getCurrentFund($budgetYear)->booked_balance -= $diff;
         }
 
-        $expenditure->subBudgetHead->getCurrentFund(date('Y'))->save();
+        $expenditure->subBudgetHead->getCurrentFund($budgetYear)->save();
 
         return response()->json([
             'data' => new ExpenditureResource($expenditure),
@@ -239,6 +242,7 @@ class ExpenditureController extends Controller
         }
 
         $previousAmount = $expenditure->amount;
+        $budgetYear = config('site.budget_year') ?? config('budget.budget_year');
 
         $expenditure->update([
             'amount' => $request->amount,
@@ -246,15 +250,15 @@ class ExpenditureController extends Controller
 
         if ($previousAmount > $request->amount) {
             $diff = $previousAmount - $request->amount;
-            $expenditure->subBudgetHead->getCurrentFund(date('Y'))->booked_expenditure -= $diff;
-            $expenditure->subBudgetHead->getCurrentFund(date('Y'))->booked_balance += $diff;
+            $expenditure->subBudgetHead->getCurrentFund($budgetYear)->booked_expenditure -= $diff;
+            $expenditure->subBudgetHead->getCurrentFund($budgetYear)->booked_balance += $diff;
         } else {
             $diff = $request->amount - $previousAmount;
-            $expenditure->subBudgetHead->getCurrentFund(date('Y'))->booked_expenditure += $diff;
-            $expenditure->subBudgetHead->getCurrentFund(date('Y'))->booked_balance -= $diff;
+            $expenditure->subBudgetHead->getCurrentFund($budgetYear)->booked_expenditure += $diff;
+            $expenditure->subBudgetHead->getCurrentFund($budgetYear)->booked_balance -= $diff;
         }
 
-        $expenditure->subBudgetHead->getCurrentFund(date('Y'))->save();
+        $expenditure->subBudgetHead->getCurrentFund($budgetYear)->save();
 
         $expenditure->batch->amount = $expenditure->batch->expenditures->sum('amount');
         $expenditure->batch->save();
@@ -299,7 +303,6 @@ class ExpenditureController extends Controller
         $expenditure->subBudgetHead->fund->save();
 
         $old = $expenditure;
-
         $expenditure->delete();
 
         return response()->json([

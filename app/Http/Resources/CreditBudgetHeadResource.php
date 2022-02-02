@@ -22,6 +22,7 @@ class CreditBudgetHeadResource extends JsonResource
             'id' => $this->id,
             'description' => $this->description,
             'budgetCode' => $this->subBudgetHead->budgetCode,
+            'sub_budget_head_id' => $this->sub_budget_head_id,
             'sub_budget_head_name' => $this->subBudgetHead->name,
             'department' => $this->subBudgetHead->department->code,
             'subBudgetHead' => $this->subBudgetHead,
@@ -33,7 +34,9 @@ class CreditBudgetHeadResource extends JsonResource
             'expected_performance' => $expected_performance,
             'actual_peformance' => $actual_performance,
             'exhausted' => $this->exhausted,
-            'budget_year' => (int) $this->budget_year
+            'budget_year' => (int) $this->budget_year,
+            'updated_at' => $this->updated_at,
+            'month' => $this->updated_at->format("F")
         ];
     }
 }

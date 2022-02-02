@@ -17,25 +17,26 @@ class SubBudgetHeadResource extends JsonResource
      */
     public function toArray($request)
     {
-        $year = date('Y');
+        $year = 2021;
         $fund = $this->getCurrentFund($year);
-        $exp = $fund->approved_amount != 0 ? ($fund->booked_expenditure / $fund->approved_amount) * 100 : 0;
-        $act = $fund->approved_amount != 0 ? ($fund->actual_expenditure / $fund->approved_amount) * 100 : 0;
+        $exp = $fund->approved_amount > 0 ? ($fund->booked_expenditure / $fund->approved_amount) * 100 : 0;
+        $act = $fund->approved_amount > 0 ? ($fund->actual_expenditure / $fund->approved_amount) * 100 : 0;
         // return parent::toArray($request);
         return [
             'id' => $this->id,
             'budget_head_id' => $this->budget_head_id,
+            'budget_head' => $this->budgetHead->budgetId,
+            'department_code' => $this->department->code,
             'department_id' => $this->department_id,
             'budgetCode' => $this->budgetCode,
             'name' => $this->name,
             'description' => $this->description,
             'type' => $this->type,
-            'logisticsBudget' => $this->logisticsBudget,
+            'logisticsBudget' => $this->logisticsBudget ? 'Yes' : 'No',
             'department' => $this->department,
             'budgetHead' => $this->budgetHead,
             'fund' => new CreditBudgetHeadResource($this->getCurrentFund($year)),
             'funds' => $this->funds,
-            'balance' => $this->fund ? $this->fund->actual_balance : 0,
             'approved_amount' => $fund->approved_amount,
             'booked_expenditure' => $fund->booked_expenditure,
             'actual_expenditure' => $fund->actual_expenditure,
@@ -49,7 +50,8 @@ class SubBudgetHeadResource extends JsonResource
 
     public function getTotals()
     {
-        $currentYear = date('Y');
+        $currentYear = 2021;
+
         foreach($this->department->subBudgetHeads as $subBudgetHead)
         {
             $fund = $subBudgetHead->getCurrentFund($currentYear);

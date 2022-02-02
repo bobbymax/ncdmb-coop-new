@@ -20,6 +20,7 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     Route::get('budgetSummary', 'BudgetSummaryController@getBudgetOverview');
     Route::post('getPerformance', 'BudgetSummaryController@chartDisplay');
     Route::get('departments/{department}/budget/summary', 'BudgetSummaryController@getBudgetSummary');
+    Route::get('dashboard/overview', 'DashboardController@init');
 
     // Access Control
     Route::apiResource('roles', 'RoleController');
@@ -30,6 +31,7 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     Route::apiResource('workFlows', 'WorkFlowController');
     Route::apiResource('procedures', 'ProcedureController');
     Route::apiResource('approvals', 'ApprovalController');
+    Route::apiResource('settings', 'SettingController');
 
     // Budget Control
     Route::apiResource('budgetHeads', 'BudgetHeadController');

@@ -20,7 +20,7 @@ class AuthApiController extends Controller
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'email' => 'required|string|max:255',
+            'staff_no' => 'required|max:255',
             'password' => 'required|string'
         ]);
 
@@ -29,17 +29,18 @@ class AuthApiController extends Controller
             return response()->json([
                 'data' => $validator->errors(),
                 'status' => 'error',
-                'message' => 'An error occured'
+                'message' => 'An error occured',
+                'requess' => $request->all()
             ], 422);
         }
 
-        $loginCredentials = $request->only('email', 'password');
+        $loginCredentials = $request->only('staff_no', 'password');
 
         if (! Auth::attempt($loginCredentials)) {
             return response()->json([
                 'data' => null,
                 'status' => 'error',
-                'message' => 'Invalid login details',
+                'message' => 'Invalid login details'
             ], 422);
         }
 

@@ -26,7 +26,7 @@ class StaffController extends Controller
      */
     public function index()
     {
-        $staff = User::all();
+        $staff = User::latest()->get();
 
         if ($staff->count() < 1) {
             return response()->json([
@@ -64,9 +64,11 @@ class StaffController extends Controller
         $validator = Validator::make($request->all(), [
            'staff_no' => 'required|string|unique:users',
            'grade_level_id' => 'required|integer',
-           'departments' => 'required',
+           'department_id' => 'required|integer',
+           // 'departments' => 'required',
            'name' => 'required|string',
            'email' => 'required|email|unique:users',
+           'roles' => 'required|array'
         ]);
 
         if ($validator->fails()) {
@@ -82,7 +84,8 @@ class StaffController extends Controller
             'grade_level_id' => $request->grade_level_id,
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make('Password1')
+            'password' => Hash::make('Password1'),
+            'department_id' => $request->department_id
         ]);
 
         if ($request->has('departments')) {

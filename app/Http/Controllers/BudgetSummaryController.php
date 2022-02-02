@@ -26,7 +26,8 @@ class BudgetSummaryController extends Controller
         // 2. fetch all sub budgets heads for that department
         $subBudgetHeads = $department->subBudgetHeads;
         // 3. Sum all parameters in the fetched sub budget heads
-        $currentYear = date('Y');
+        $currentYear = config('site.budget_year') ?? config('budget.budget_year');
+        
         foreach ($subBudgetHeads as $subBudgetHead) {
             $fund = $subBudgetHead->getCurrentFund($currentYear);
 
@@ -73,7 +74,7 @@ class BudgetSummaryController extends Controller
         // 2. fetch all sub budgets heads for that department
         $subBudgetHeads = $department->subBudgetHeads;
         // 3. Sum all parameters in the fetched sub budget heads
-        $currentYear = date('Y');
+        $currentYear = config('site.budget_year') ?? config('budget.budget_year');
         if ($request->report === "month") {
             $month = $this->monthsOfTheYear[now()->month - 1];
 

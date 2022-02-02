@@ -19,5 +19,7 @@ return [
 		'endpoints' => env('ORG_API', 'https://budget-api.ncdmb.gov.ng')
 	],
 
+    'budget_year' => 2021
+
 
 ];

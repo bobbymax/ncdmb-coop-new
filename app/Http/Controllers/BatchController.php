@@ -164,6 +164,7 @@ class BatchController extends Controller
     {
         $batch = Batch::find($batchId);
         $subBudgetHead = SubBudgetHead::where('budgetCode', $batch->subBudgetHeadCode)->first();
+        $budgetYear = config('site.budget_year') ?? config('budget.budget_year');
 
         switch ($level) {
             case 'treasury' :
@@ -181,10 +182,10 @@ class BatchController extends Controller
 
                     // $subBudgetHead->getCurrentFund(date('Y'))->booked_expenditure -= $batch->amount;
                     // $subBudgetHead->getCurrentFund(date('Y'))->booked_balance -= $batch->amount;
-                    $subBudgetHead->getCurrentFund(date('Y'))->actual_expenditure += $batch->amount;
-                    $subBudgetHead->getCurrentFund(date('Y'))->actual_balance -= $batch->amount;
+                    $subBudgetHead->getCurrentFund($budgetYear)->actual_expenditure += $batch->amount;
+                    $subBudgetHead->getCurrentFund($budgetYear)->actual_balance -= $batch->amount;
 
-                    $subBudgetHead->getCurrentFund(date('Y'))->save();
+                    $subBudgetHead->getCurrentFund($budgetYear)->save();
                 }
                 break;
             case 'audit' :
