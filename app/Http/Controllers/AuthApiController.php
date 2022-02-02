@@ -19,40 +19,46 @@ class AuthApiController extends Controller
 
     public function login(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'staff_no' => 'required|max:255',
-            'password' => 'required|string'
-        ]);
+        // $validator = Validator::make($request->all(), [
+        //     'staff_no' => 'required|max:255',
+        //     'password' => 'required|string'
+        // ]);
 
-        // check if validation rules failed
-        if ($validator->fails()) {
-            return response()->json([
-                'data' => $validator->errors(),
-                'status' => 'error',
-                'message' => 'An error occured',
-                'requess' => $request->all()
-            ], 422);
-        }
+        // // check if validation rules failed
+        // if ($validator->fails()) {
+        //     return response()->json([
+        //         'data' => $validator->errors(),
+        //         'status' => 'error',
+        //         'message' => 'An error occured',
+        //         'requess' => $request->all()
+        //     ], 422);
+        // }
 
-        $loginCredentials = $request->only('staff_no', 'password');
+        // $loginCredentials = $request->only('staff_no', 'password');
 
-        if (! Auth::attempt($loginCredentials)) {
-            return response()->json([
-                'data' => null,
-                'status' => 'error',
-                'message' => 'Invalid login details'
-            ], 422);
-        }
+        // if (! Auth::attempt($loginCredentials)) {
+        //     return response()->json([
+        //         'data' => null,
+        //         'status' => 'error',
+        //         'message' => 'Invalid login details'
+        //     ], 422);
+        // }
 
-        $token = Auth::user()->createToken('authToken')->accessToken;
+        // $token = Auth::user()->createToken('authToken')->accessToken;
+
+        // return response()->json([
+        //     'message' => 'Login Successful',
+        //     'status' => 'success',
+        //     'data' => [
+        //         'token' => $token,
+        //         'user' => new UserResource(Auth::user()),
+        //     ]
+        // ]);
 
         return response()->json([
             'message' => 'Login Successful',
             'status' => 'success',
-            'data' => [
-                'token' => $token,
-                'user' => new UserResource(Auth::user()),
-            ]
+            'data' => 'user details'
         ]);
     }
 
