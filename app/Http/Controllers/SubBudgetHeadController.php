@@ -24,7 +24,7 @@ class SubBudgetHeadController extends Controller
      */
     public function index()
     {
-        $subBudgetHeads = SubBudgetHead::all();
+        $subBudgetHeads = SubBudgetHead::latest()->get();
 
         if ($subBudgetHeads->count() < 1) {
             return response()->json([
