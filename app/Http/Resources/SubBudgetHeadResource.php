@@ -21,7 +21,7 @@ class SubBudgetHeadResource extends JsonResource
         $fund = $this->getCurrentFund($year);
         $exp = $fund->approved_amount > 0 ? ($fund->booked_expenditure / $fund->approved_amount) * 100 : 0;
         $act = $fund->approved_amount > 0 ? ($fund->actual_expenditure / $fund->approved_amount) * 100 : 0;
-        // return parent::toArray($request);
+        
         return [
             'id' => $this->id,
             'budget_head_id' => $this->budget_head_id,
