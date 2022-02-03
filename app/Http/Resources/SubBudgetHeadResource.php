@@ -46,7 +46,7 @@ class SubBudgetHeadResource extends JsonResource
             'booked_balance' => $fund->booked_balance,
             'actual_balance' => $fund->actual_balance,
             'expected_performance' => $fund && $this->exp ? round($this->exp) . '%' : 0,
-            'actual_performance' => $fund && $this->act ? round($act) . '%' : 0,
+            'actual_performance' => $fund && $this->act ? round($this->act) . '%' : 0,
             'totals' => $this->getTotals()
         ];
     }
