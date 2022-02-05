@@ -35,7 +35,7 @@ class SubBudgetHeadResource extends JsonResource
             'name' => $this->name,
             'description' => $this->description,
             'type' => $this->type,
-            'logisticsBudget' => $this->logisticsBudget ? 'Yes' : 'No',
+            'logisticsBudget' => $this->logisticsBudget,
             'department' => $this->department,
             'budgetHead' => $this->budgetHead,
             'fund' => new CreditBudgetHeadResource($this->getCurrentFund($year)),

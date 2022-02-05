@@ -6,6 +6,7 @@ use App\Http\Resources\ModuleResource;
 use App\Models\Department;
 use App\Models\Group;
 use App\Models\Module;
+use App\Models\Manifest;
 use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -66,7 +67,8 @@ class ModuleController extends Controller
             'generatePermissions' => 'required',
             'parentId' => 'required',
             'isAdministration' => 'required',
-            'type' => 'required|string|in:application,module,page'
+            'type' => 'required|string|in:application,module,page',
+            'manifests' => 'required|array'
         ]);
 
         if ($validator->fails()) {
@@ -90,6 +92,25 @@ class ModuleController extends Controller
             'isAdministration' => $request->isAdministration,
             'type' => $request->type
         ]);
+
+        if ($module && $request->manifests) {
+            foreach($request->manifests as $manifest) {
+                Manifest::create([
+                    'module_id' => $module->id,
+                    'name' => $manifest['name'],
+                    'input_type' => $manifest['input_type'],
+                    'grid' => $manifest['grid'],
+                    'defaultValue' => $manifest['defaultValue'],
+                    'placeholder' => $manifest['placeholder'],
+                    'details' => json_encode($manifest['details']),
+                    'browse' => $manifest['browse'],
+                    'read' => $manifest['read'],
+                    'edit' => $manifest['edit'],
+                    'add' => $manifest['add'],
+                    'delete' => $manifest['delete'],
+                ]);
+            }
+        }
 
         if ($request->generatePermissions) {
 

@@ -60,6 +60,11 @@ class Module extends Model
         return $this->roles()->save($role);
     }
 
+    public function manifests()
+    {
+        return $this->hasMany(Manifest::class);
+    }
+
     public function normalizer($module)
     {
         foreach($this->actions() as $action) {
