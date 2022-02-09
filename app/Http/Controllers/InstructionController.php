@@ -120,7 +120,8 @@ class InstructionController extends Controller
             'to' => 'required|date',
             'description' => 'required|min:3',
             'amount' => 'required',
-            'instructions' => 'required|array'
+            'instructions' => 'required|array',
+            'status' => 'required|in:registered,unregistered'
         ]);
 
         if ($validator->fails()) {
@@ -141,20 +142,31 @@ class InstructionController extends Controller
             ], 422);
         }
 
-        if ($request->has('instructions')) {
-            foreach ($request->instructions as $value) {
-                $instruction = new Instruction;
+        try {
 
-                $instruction->benefit_id = $value['benefit_id'];
-                $instruction->additional_benefit_id = $value['additional_benefit_id'];
-                $instruction->from = Carbon::parse($value['from']);
-                $instruction->to = Carbon::parse($value['to']);
-                $instruction->description = $value['description'];
-                $instruction->amount = $value['amount'];
+            if ($request->has('instructions')) {
+                foreach ($request->instructions as $value) {
+                    $instruction = new Instruction;
 
-                $claim->instructions()->save($instruction);
+                    $instruction->benefit_id = $value['benefit_id'];
+                    $instruction->additional_benefit_id = $value['additional_benefit_id'];
+                    $instruction->from = Carbon::parse($value['from']);
+                    $instruction->to = Carbon::parse($value['to']);
+                    $instruction->description = $value['description'];
+                    $instruction->amount = $value['amount'];
+
+                    $claim->instructions()->save($instruction);
+                }
             }
+
+            $claim->status = $request->status;
+            $claim->save();
+
+        } catch(e) {
+            //
         }
+
+
 
         return response()->json([
             'data' => new ClaimResource($claim),
