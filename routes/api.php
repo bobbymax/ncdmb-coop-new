@@ -55,6 +55,7 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     Route::apiResource('claims', 'ClaimController');
     Route::apiResource('claims/{claim}/instructions', 'InstructionController');
     Route::get('fetch/claims/{claim}', 'ClaimController@fetchClaimByCode');
+    Route::post('claim/instructions', 'InstructionController@addClaimInstructions');
 
     // Additional Access Control Routes
     Route::post('groups/{group}/staffs', 'GroupController@addStaffsToGroup');
