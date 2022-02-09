@@ -24,7 +24,7 @@ class ClaimResource extends JsonResource
             'created_at' => $this->created_at,
             'total_amount' => $this->total_amount,
             'owner' => new UserResource($this->staff),
-            'instructions' => $this->instructions,
+            'instructions' => InstructionResource::collection($this->instructions) ?? [],
             'expenditure' => $this->expenditure ?? null
         ];
     }

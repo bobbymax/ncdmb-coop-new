@@ -23,11 +23,11 @@ class BenefitResource extends JsonResource
             'label' => $this->label,
             'parentId' => $this->parentId,
             'description' => $this->description,
-            'parent' => $this->parentId != 0 ? $this->parent->name : 'No Parent',
+            'parent' => $this->parentId > 0 ? $this->parent->name : 'No Parent',
             'entitlements' => $this->entitlements ? EntitlementResource::collection($this->entitlements) : null,
             'wages' => $this->prices,
             'canAddEntitlement' => $this->canAddEntitlementCheck(),
-            'children' => $this->children,
+            'children' => BenefitResource::collection($this->children),
             'hasChildren' => count($this->children) > 0 ? true : false,
             'numOfDays' => $this->numOfDays == 1 ? true : false
         ];

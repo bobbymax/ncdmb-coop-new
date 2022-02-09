@@ -20,7 +20,7 @@ class InstructionResource extends JsonResource
             'benefit_id' => $this->benefit_id,
             'benefit' => $this->benefit->name,
             'additional_benefit_id' => $this->additional_benefit_id,
-            'category' => $this->additional_benefit_id != 0 ? $this->category->name : null,
+            'category' => $this->additional_benefit_id > 0 ? $this->category->name : null,
             'from' => $this->from->format('Y-m-d'),
             'to' => $this->to->format('Y-m-d'),
             'description' => $this->description,
