@@ -115,11 +115,6 @@ class InstructionController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'claim_id' => 'required|integer',
-            'benefit_id' => 'required|integer',
-            'from' => 'required|date',
-            'to' => 'required|date',
-            'description' => 'required|min:3',
-            'amount' => 'required',
             'instructions' => 'required|array',
             'status' => 'required|in:registered,unregistered'
         ]);
