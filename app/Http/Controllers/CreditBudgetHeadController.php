@@ -80,7 +80,7 @@ class CreditBudgetHeadController extends Controller
             'approved_amount' => $request->approved_amount,
             'actual_balance' => $request->approved_amount,
             'booked_balance' => $request->approved_amount,
-            'budget_year' => date('Y')
+            'budget_year' => config('settings.budget_year') ?? config('budget.budget_year')
         ]);
 
         return response()->json([
@@ -169,18 +169,11 @@ class CreditBudgetHeadController extends Controller
             ], 422);
         }
 
-//        $creditBudgetHead->update([
-//            'description' => $request->description,
-//            'approved_amount' => $creditBudgetHead->approved_amount + $request->approved_amount,
-//            'actual_balance' => $creditBudgetHead->actual_balance + $request->approved_amount,
-//            'booked_balance' => $creditBudgetHead->booked_balance + $request->approved_amount
-//        ]);
-
         $creditBudgetHead->update([
             'description' => $request->description,
-            'approved_amount' => $request->approved_amount,
-            'actual_balance' => $request->approved_amount,
-            'booked_balance' => $request->approved_amount
+            'approved_amount' => $request->approved_amount + $creditBudgetHead->approved_amount,
+            'actual_balance' => $request->approved_amount + $creditBudgetHead->actual_balance,
+            'booked_balance' => $request->approved_amount + $creditBudgetHead->booked_balance
         ]);
 
         return response()->json([
