@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\Validator;
 
 class InstructionController extends Controller
 {
+
+    private $total = 0;
+
     public function __construct()
     {
         $this->middleware('auth:api');
@@ -138,6 +141,7 @@ class InstructionController extends Controller
         }
 
         if ($request->has('instructions')) {
+
             foreach ($request->instructions as $value) {
                 $instruction = new Instruction;
 
@@ -149,9 +153,12 @@ class InstructionController extends Controller
                 $instruction->amount = $value['amount'];
 
                 $claim->instructions()->save($instruction);
+
+                $this->total += $instruction->amount;
             }
         }
 
+        $claim->total_amount = $this->total;
         $claim->status = $request->status;
         $claim->save();
 
