@@ -137,31 +137,23 @@ class InstructionController extends Controller
             ], 422);
         }
 
-        try {
+        if ($request->has('instructions')) {
+            foreach ($request->instructions as $value) {
+                $instruction = new Instruction;
 
-            if ($request->has('instructions')) {
-                foreach ($request->instructions as $value) {
-                    $instruction = new Instruction;
+                $instruction->benefit_id = $value['benefit_id'];
+                $instruction->additional_benefit_id = $value['additional_benefit_id'];
+                $instruction->from = Carbon::parse($value['from']);
+                $instruction->to = Carbon::parse($value['to']);
+                $instruction->description = $value['description'];
+                $instruction->amount = $value['amount'];
 
-                    $instruction->benefit_id = $value['benefit_id'];
-                    $instruction->additional_benefit_id = $value['additional_benefit_id'];
-                    $instruction->from = Carbon::parse($value['from']);
-                    $instruction->to = Carbon::parse($value['to']);
-                    $instruction->description = $value['description'];
-                    $instruction->amount = $value['amount'];
-
-                    $claim->instructions()->save($instruction);
-                }
+                $claim->instructions()->save($instruction);
             }
-
-            $claim->status = $request->status;
-            $claim->save();
-
-        } catch(e) {
-            //
         }
 
-
+        $claim->status = $request->status;
+        $claim->save();
 
         return response()->json([
             'data' => new ClaimResource($claim),
