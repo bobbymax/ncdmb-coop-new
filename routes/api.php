@@ -32,6 +32,7 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     Route::apiResource('procedures', 'ProcedureController');
     Route::apiResource('approvals', 'ApprovalController');
     Route::apiResource('settings', 'SettingController');
+    Route::apiResource('logisticsRequests', 'LogisticsController');
 
     // Budget Control
     Route::apiResource('budgetHeads', 'BudgetHeadController');
