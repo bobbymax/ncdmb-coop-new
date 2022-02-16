@@ -141,6 +141,33 @@ class LogisticsController extends Controller
         ], 200);
     }
 
+    public function fulfillLogisticsRequest(Request $request, $logisticsRequest)
+    {
+        $validator = Validator::make($request->all(), [
+            'closed' => 'required',
+        ]);
+
+        $logisticsRequest = Logistics::find($logisticsRequest);
+
+        if (! $logisticsRequest) {
+            return response()->json([
+                'data' => null,
+                'status' => 'error',
+                'message' => 'Invalid token'
+            ], 422);
+        }
+
+        $logisticsRequest->update([
+            'closed' => $request->closed
+        ]);
+
+        return response()->json([
+            'data' => new LogisticsResource($logisticsRequest),
+            'status' => 'success',
+            'message' => 'Logistics has been Completed Successfully!'
+        ], 200);
+    }
+
     /**
      * Update the specified resource in storage.
      *
