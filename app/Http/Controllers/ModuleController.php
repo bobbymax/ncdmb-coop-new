@@ -62,13 +62,10 @@ class ModuleController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'path' => 'required|string',
-            'component' => 'required|string|unique:modules',
-            'isAuthRequired' => 'required',
             'generatePermissions' => 'required',
             'parentId' => 'required',
-            'isAdministration' => 'required',
             'type' => 'required|string|in:application,module,page',
-            'manifests' => 'required|array'
+            'roles' => 'required|array'
         ]);
 
         if ($validator->fails()) {
@@ -83,34 +80,12 @@ class ModuleController extends Controller
             'name' => $request->name,
             'label' => Str::slug($request->name),
             'path' => $request->path,
-            'component' => $request->component,
             'icon' => $request->icon,
             'parentId' => $request->parentId,
             'generatePermissions' => $request->generatePermissions,
-            'isAuthRequired' => $request->isAuthRequired,
             'isMenu' => $request->isMenu,
-            'isAdministration' => $request->isAdministration,
             'type' => $request->type
         ]);
-
-        if ($module && $request->manifests) {
-            foreach($request->manifests as $manifest) {
-                Manifest::create([
-                    'module_id' => $module->id,
-                    'name' => $manifest['name'],
-                    'input_type' => $manifest['input_type'],
-                    'grid' => $manifest['grid'],
-                    'defaultValue' => $manifest['defaultValue'],
-                    'placeholder' => $manifest['placeholder'],
-                    'details' => json_encode($manifest['details']),
-                    'browse' => $manifest['browse'],
-                    'read' => $manifest['read'],
-                    'edit' => $manifest['edit'],
-                    'add' => $manifest['add'],
-                    'delete' => $manifest['delete'],
-                ]);
-            }
-        }
 
         if ($request->generatePermissions) {
 
@@ -124,17 +99,17 @@ class ModuleController extends Controller
 
         }
 
-        if ($request->has('departments')) {
-            $currentDepartments = $module->departments->pluck('id')->toArray();
+        // if ($request->has('departments')) {
+        //     $currentDepartments = $module->departments->pluck('id')->toArray();
 
-            foreach($request->departments as $department) {
-                $dept = Department::find($department['value']);
+        //     foreach($request->departments as $department) {
+        //         $dept = Department::find($department['value']);
 
-                if ($dept && ! in_array($dept->id, $currentDepartments)) {
-                    $module->departments()->save($dept);
-                }
-            }
-        }
+        //         if ($dept && ! in_array($dept->id, $currentDepartments)) {
+        //             $module->departments()->save($dept);
+        //         }
+        //     }
+        // }
 
         if ($request->has('roles')) {
             $currentRoles = $module->roles->pluck('id')->toArray();
@@ -276,8 +251,6 @@ class ModuleController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'path' => 'required|string',
-            'component' => 'required|string',
-            'isAuthRequired' => 'required',
             'parentId' => 'required',
             'type' => 'required|string|in:application,module,page'
         ]);
@@ -304,26 +277,23 @@ class ModuleController extends Controller
             'name' => $request->name,
             'label' => Str::slug($request->name),
             'path' => $request->path,
-            'component' => $request->component,
             'icon' => $request->icon,
             'parentId' => $request->parentId,
-            'isAuthRequired' => $request->isAuthRequired,
             'isMenu' => $request->isMenu,
-            'isAdministration' => $request->isAdministration,
             'type' => $request->type
         ]);
 
-        if ($request->has('departments')) {
-            $currentDepartments = $module->departments->pluck('id')->toArray();
+        // if ($request->has('departments')) {
+        //     $currentDepartments = $module->departments->pluck('id')->toArray();
 
-            foreach($request->departments as $department) {
-                $dept = Department::find($department['value']);
+        //     foreach($request->departments as $department) {
+        //         $dept = Department::find($department['value']);
 
-                if ($dept && ! in_array($dept->id, $currentDepartments)) {
-                    $module->departments()->save($dept);
-                }
-            }
-        }
+        //         if ($dept && ! in_array($dept->id, $currentDepartments)) {
+        //             $module->departments()->save($dept);
+        //         }
+        //     }
+        // }
 
         if ($request->has('roles')) {
             $currentRoles = $module->roles->pluck('id')->toArray();
