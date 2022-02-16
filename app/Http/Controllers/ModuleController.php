@@ -114,8 +114,8 @@ class ModuleController extends Controller
         if ($request->has('roles')) {
             $currentRoles = $module->roles->pluck('id')->toArray();
 
-            foreach($request->roles as $role) {
-                $r = Role::find($role['value']);
+            foreach($request->roles as $value) {
+                $r = Role::find($value);
 
                 if ($r && ! in_array($r->id, $currentRoles)) {
                     $module->roles()->save($r);
@@ -298,8 +298,8 @@ class ModuleController extends Controller
         if ($request->has('roles')) {
             $currentRoles = $module->roles->pluck('id')->toArray();
 
-            foreach($request->roles as $role) {
-                $r = Role::find($role['value']);
+            foreach($request->roles as $value) {
+                $r = Role::find($value);
 
                 if ($r && ! in_array($r->id, $currentRoles)) {
                     $module->roles()->save($r);
