@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Logistics;
 use App\Http\Resources\LogisticsResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class LogisticsController extends Controller
 {
