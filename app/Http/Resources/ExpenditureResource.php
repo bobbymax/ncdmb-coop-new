@@ -32,8 +32,8 @@ class ExpenditureResource extends JsonResource
             'payment_type' => $this->payment_type,
             'status' => $this->status,
             'refunded' => $this->refund,
-            'created_at' => $this->created_at->format('d M, Y'),
-            'updated_at' => $this->updated_at->format('d M, Y'),
+            'created_at' => $this->created_at->format('M, Y'),
+            'updated_at' => $this->updated_at->format('M, Y'),
         ];
     }
 }
