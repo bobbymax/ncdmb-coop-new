@@ -35,4 +35,9 @@ class SubBudgetHead extends Model
     {
         return $this->hasMany(Refund::class);
     }
+
+    public function expenditures()
+    {
+        return $this->hasMany(Expenditure::class);
+    }
 }

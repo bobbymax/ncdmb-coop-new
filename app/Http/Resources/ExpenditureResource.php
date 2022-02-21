@@ -20,7 +20,7 @@ class ExpenditureResource extends JsonResource
             'user_id' => $this->user_id,
             'controller' => new UserResource($this->initiator),
             'sub_budget_head_id' => $this->sub_budget_head_id,
-            'subBudgetHead' => new SubBudgetHeadResource($this->subBudgetHead),
+            'subBudgetHead' => $this->subBudgetHead,
             'claim_id' => $this->claim_id,
             'claim' => $this->claim_id > 0 ? new ClaimResource($this->claim) : null,
             'beneficiary' => $this->beneficiary,
@@ -31,7 +31,9 @@ class ExpenditureResource extends JsonResource
             'type' => $this->type,
             'payment_type' => $this->payment_type,
             'status' => $this->status,
-            'refunded' => $this->refund
+            'refunded' => $this->refund,
+            'created_at' => $this->created_at->format('M, Y'),
+            'updated_at' => $this->updated_at->format('M, Y'),
         ];
     }
 }

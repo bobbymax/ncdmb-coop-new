@@ -295,7 +295,7 @@ class ModuleController extends Controller
         //     }
         // }
 
-        if ($request->has('roles')) {
+        if (count($request->roles) > 0) {
             $currentRoles = $module->roles->pluck('id')->toArray();
 
             foreach($request->roles as $value) {
