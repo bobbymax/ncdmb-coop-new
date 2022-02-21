@@ -81,7 +81,7 @@ class AuthApiController extends Controller
         }
 
         foreach ($request->roles as $role) {
-            $role = Role::find($role);
+            $role = Role::find($role["value"]);
 
             if ($role && ! in_array($role->id, $user->roles->pluck('id')->toArray())) {
                 $user->assignRole($role);
