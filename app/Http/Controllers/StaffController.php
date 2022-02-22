@@ -182,7 +182,6 @@ class StaffController extends Controller
         $validator = Validator::make($request->all(), [
             'staff_no' => 'required|string',
             'grade_level_id' => 'required|integer',
-            'departments' => 'required',
             'name' => 'required|string',
             'email' => 'required|email',
         ]);
@@ -212,20 +211,20 @@ class StaffController extends Controller
             'email' => $request->email,
         ]);
 
-        if ($request->has('departments')) {
-            foreach($request->departments as $department) {
-                $dept = Department::find($department['value']);
+        // if ($request->has('departments')) {
+        //     foreach($request->departments as $department) {
+        //         $dept = Department::find($department['value']);
 
-                if ($dept->type == "department" && $staff->department_id == 0) {
-                    $staff->department_id = $dept->id;
-                    $staff->save();
-                }
+        //         if ($dept->type == "department" && $staff->department_id == 0) {
+        //             $staff->department_id = $dept->id;
+        //             $staff->save();
+        //         }
 
-                if ($dept && !in_array($dept->id, $staff->currentDepartments())) {
-                    $staff->departments()->save($dept);
-                }
-            }
-        }
+        //         if ($dept && !in_array($dept->id, $staff->currentDepartments())) {
+        //             $staff->departments()->save($dept);
+        //         }
+        //     }
+        // }
 
         if ($request->has('roles')) {
             foreach($request->roles as $role) {

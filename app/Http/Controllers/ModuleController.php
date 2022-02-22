@@ -283,18 +283,6 @@ class ModuleController extends Controller
             'type' => $request->type
         ]);
 
-        // if ($request->has('departments')) {
-        //     $currentDepartments = $module->departments->pluck('id')->toArray();
-
-        //     foreach($request->departments as $department) {
-        //         $dept = Department::find($department['value']);
-
-        //         if ($dept && ! in_array($dept->id, $currentDepartments)) {
-        //             $module->departments()->save($dept);
-        //         }
-        //     }
-        // }
-
         if ($request->roles) {
             $currentRoles = $module->roles->pluck('id')->toArray();
 
