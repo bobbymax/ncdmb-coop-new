@@ -276,7 +276,7 @@ class ExpenditureController extends Controller
      * @param  \App\Models\Expenditure  $expenditure
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(Expenditure $expenditure)
+    public function destroy($expenditure)
     {
         $expenditure = Expenditure::find($expenditure);
 

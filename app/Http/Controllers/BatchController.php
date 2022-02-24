@@ -61,7 +61,7 @@ class BatchController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'expenditures' => 'required',
+            'expenditures' => 'required|array',
             'amount' => 'required',
             'batch_no' => 'required|string|unique:batches',
             'noOfClaim' => 'required|integer',
@@ -122,7 +122,8 @@ class BatchController extends Controller
             'level' => 'required|string',
             'status' => 'required|string',
             'work_flow' => 'required|string',
-            'batchId' => 'required'
+            'batchId' => 'required|integer',
+            'description' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -180,8 +181,6 @@ class BatchController extends Controller
                     $batch->status = 'paid';
                     $batch->save();
 
-                    // $subBudgetHead->getCurrentFund(date('Y'))->booked_expenditure -= $batch->amount;
-                    // $subBudgetHead->getCurrentFund(date('Y'))->booked_balance -= $batch->amount;
                     $subBudgetHead->getCurrentFund($budgetYear)->actual_expenditure += $batch->amount;
                     $subBudgetHead->getCurrentFund($budgetYear)->actual_balance -= $batch->amount;
 

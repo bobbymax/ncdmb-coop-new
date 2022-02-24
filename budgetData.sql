@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.27, for macos11.6 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.28, for macos11.6 (arm64)
 --
--- Host: localhost    Database: ncdmb_erp
+-- Host: localhost    Database: budget
 -- ------------------------------------------------------
--- Server version	8.0.27
+-- Server version	8.0.28
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -25,13 +25,13 @@ DROP TABLE IF EXISTS `approvals`;
 CREATE TABLE `approvals` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
-  `work_flow` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `level` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `work_flow` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `level` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `approveable_id` bigint unsigned NOT NULL,
-  `approveable_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` longtext COLLATE utf8mb4_unicode_ci,
-  `response` longtext COLLATE utf8mb4_unicode_ci,
-  `status` enum('pending','in-progress','approved','denied','queried') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `approveable_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `response` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `status` enum('pending','in-progress','approved','denied','queried') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -60,13 +60,13 @@ DROP TABLE IF EXISTS `batches`;
 CREATE TABLE `batches` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
-  `batch_no` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `subBudgetHeadCode` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `batch_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `subBudgetHeadCode` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `amount` decimal(30,2) NOT NULL DEFAULT '0.00',
   `noOfClaim` int NOT NULL DEFAULT '0',
-  `level` enum('budget-office','treasury','audit') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'budget-office',
+  `level` enum('budget-office','treasury','audit') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'budget-office',
   `steps` int NOT NULL DEFAULT '0',
-  `status` enum('pending','registered','queried','paid','archived') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `status` enum('pending','registered','queried','paid','archived') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
   `budget` tinyint(1) NOT NULL DEFAULT '0',
   `treasury` tinyint(1) NOT NULL DEFAULT '0',
   `audit` tinyint(1) NOT NULL DEFAULT '0',
@@ -102,9 +102,9 @@ CREATE TABLE `benefits` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `parentId` bigint NOT NULL DEFAULT '0',
   `numOfDays` tinyint(1) NOT NULL DEFAULT '0',
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `label` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `label` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `notActive` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -133,8 +133,8 @@ DROP TABLE IF EXISTS `budget_heads`;
 CREATE TABLE `budget_heads` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `budgetId` bigint NOT NULL DEFAULT '0',
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `label` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `label` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -162,11 +162,11 @@ DROP TABLE IF EXISTS `claims`;
 CREATE TABLE `claims` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
-  `title` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `reference_no` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `title` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `reference_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `total_amount` decimal(30,2) NOT NULL DEFAULT '0.00',
-  `type` enum('staff-claim','touring-advance','third-party') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'staff-claim',
-  `status` enum('pending','registered','unregistered','cleared','batched','queried','paid') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `type` enum('staff-claim','touring-advance','third-party') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'staff-claim',
+  `status` enum('pending','registered','unregistered','cleared','batched','queried','paid') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
   `paid` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -197,7 +197,7 @@ DROP TABLE IF EXISTS `credit_budget_heads`;
 CREATE TABLE `credit_budget_heads` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `sub_budget_head_id` bigint unsigned NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `approved_amount` decimal(30,2) NOT NULL DEFAULT '0.00',
   `booked_expenditure` decimal(30,2) NOT NULL DEFAULT '0.00',
   `actual_expenditure` decimal(30,2) NOT NULL DEFAULT '0.00',
@@ -234,10 +234,10 @@ DROP TABLE IF EXISTS `departments`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `departments` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `label` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `code` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `type` enum('directorate','division','department','unit') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'department',
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `label` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` enum('directorate','division','department','unit') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'department',
   `parentId` bigint NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -303,17 +303,18 @@ CREATE TABLE `expenditures` (
   `user_id` bigint unsigned NOT NULL,
   `sub_budget_head_id` bigint unsigned NOT NULL,
   `claim_id` bigint NOT NULL DEFAULT '0',
-  `beneficiary` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `beneficiary` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `batch_id` bigint NOT NULL DEFAULT '0',
   `amount` decimal(30,2) NOT NULL DEFAULT '0.00',
-  `description` text COLLATE utf8mb4_unicode_ci,
-  `additional_info` text COLLATE utf8mb4_unicode_ci,
-  `type` enum('staff-claim','touring-advance','other') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'staff-claim',
-  `payment_type` enum('staff-payment','third-party') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'staff-payment',
-  `status` enum('cleared','batched','queried','paid') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'cleared',
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `additional_info` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `type` enum('staff-claim','touring-advance','other') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'staff-claim',
+  `payment_type` enum('staff-payment','third-party') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'staff-payment',
+  `status` enum('cleared','batched','queried','paid') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'cleared',
   `closed` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
+  `batched` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `expenditures_user_id_foreign` (`user_id`),
   KEY `expenditures_sub_budget_head_id_foreign` (`sub_budget_head_id`),
@@ -328,7 +329,7 @@ CREATE TABLE `expenditures` (
 
 LOCK TABLES `expenditures` WRITE;
 /*!40000 ALTER TABLE `expenditures` DISABLE KEYS */;
-INSERT INTO `expenditures` VALUES (1,5,151,1,'EKARO TAMUNOTONYE BOBBY',1,350000.00,'MVC Visual Studio C Sharp Training',NULL,'staff-claim','staff-payment','batched',0,'2022-01-13 09:16:59','2022-01-31 12:16:50'),(2,1,141,2,'SUPER ADMIN',1,350000.00,'Trip to Los Angeles',NULL,'staff-claim','staff-payment','batched',0,'2022-01-31 12:16:26','2022-01-31 12:16:50'),(3,2,141,0,'FANTA AND COKE',2,5000000.00,'PROCUREMENT OF FANTA AND COKE',NULL,'other','third-party','batched',0,'2022-01-31 12:55:03','2022-01-31 12:58:36'),(4,1,153,0,'VUSUGA',3,40000000.00,'PRINTING',NULL,'other','third-party','batched',0,'2022-01-31 13:14:15','2022-01-31 13:14:39');
+INSERT INTO `expenditures` VALUES (1,5,151,1,'EKARO TAMUNOTONYE BOBBY',1,350000.00,'MVC Visual Studio C Sharp Training',NULL,'staff-claim','staff-payment','batched',0,'2022-01-13 09:16:59','2022-01-31 12:16:50',0),(2,1,141,2,'SUPER ADMIN',1,350000.00,'Trip to Los Angeles',NULL,'staff-claim','staff-payment','batched',0,'2022-01-31 12:16:26','2022-01-31 12:16:50',0),(3,2,141,0,'FANTA AND COKE',2,5000000.00,'PROCUREMENT OF FANTA AND COKE',NULL,'other','third-party','batched',0,'2022-01-31 12:55:03','2022-01-31 12:58:36',0),(4,1,153,0,'VUSUGA',3,40000000.00,'PRINTING',NULL,'other','third-party','batched',0,'2022-01-31 13:14:15','2022-01-31 13:14:39',0);
 /*!40000 ALTER TABLE `expenditures` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -341,11 +342,11 @@ DROP TABLE IF EXISTS `failed_jobs`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `failed_jobs` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `uuid` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `connection` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `queue` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
-  `exception` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `uuid` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `connection` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `queue` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `exception` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `failed_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`)
@@ -370,9 +371,9 @@ DROP TABLE IF EXISTS `grade_levels`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `grade_levels` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `label` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `code` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `label` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -400,8 +401,8 @@ DROP TABLE IF EXISTS `groups`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `groups` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `label` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `label` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `max_slots` bigint NOT NULL DEFAULT '0',
   `start_date` date DEFAULT NULL,
   `expiry_date` date DEFAULT NULL,
@@ -438,10 +439,10 @@ CREATE TABLE `instructions` (
   `additional_benefit_id` bigint NOT NULL DEFAULT '0',
   `from` date NOT NULL,
   `to` date DEFAULT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `amount` decimal(30,2) NOT NULL DEFAULT '0.00',
   `instructionable_id` bigint unsigned NOT NULL,
-  `instructionable_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `instructionable_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -461,6 +462,46 @@ INSERT INTO `instructions` VALUES (1,6,0,'2021-11-21','2021-11-21','Flight to La
 UNLOCK TABLES;
 
 --
+-- Table structure for table `logistics`
+--
+
+DROP TABLE IF EXISTS `logistics`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `logistics` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `controller_id` bigint unsigned NOT NULL,
+  `user_id` bigint unsigned NOT NULL,
+  `sub_budget_head_id` bigint unsigned NOT NULL,
+  `department_id` bigint unsigned NOT NULL,
+  `description` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `amount` decimal(30,2) NOT NULL DEFAULT '0.00',
+  `status` enum('pending','approved','denied') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `closed` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `logistics_controller_id_foreign` (`controller_id`),
+  KEY `logistics_user_id_foreign` (`user_id`),
+  KEY `logistics_sub_budget_head_id_foreign` (`sub_budget_head_id`),
+  KEY `logistics_department_id_foreign` (`department_id`),
+  CONSTRAINT `logistics_controller_id_foreign` FOREIGN KEY (`controller_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `logistics_department_id_foreign` FOREIGN KEY (`department_id`) REFERENCES `departments` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `logistics_sub_budget_head_id_foreign` FOREIGN KEY (`sub_budget_head_id`) REFERENCES `sub_budget_heads` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `logistics_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `logistics`
+--
+
+LOCK TABLES `logistics` WRITE;
+/*!40000 ALTER TABLE `logistics` DISABLE KEYS */;
+/*!40000 ALTER TABLE `logistics` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `migrations`
 --
 
@@ -469,10 +510,10 @@ DROP TABLE IF EXISTS `migrations`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `migrations` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `migration` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `batch` int NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -481,7 +522,7 @@ CREATE TABLE `migrations` (
 
 LOCK TABLES `migrations` WRITE;
 /*!40000 ALTER TABLE `migrations` DISABLE KEYS */;
-INSERT INTO `migrations` VALUES (1,'2014_10_12_000000_create_users_table',1),(2,'2014_10_12_100000_create_password_resets_table',1),(3,'2016_06_01_000001_create_oauth_auth_codes_table',1),(4,'2016_06_01_000002_create_oauth_access_tokens_table',1),(5,'2016_06_01_000003_create_oauth_refresh_tokens_table',1),(6,'2016_06_01_000004_create_oauth_clients_table',1),(7,'2016_06_01_000005_create_oauth_personal_access_clients_table',1),(8,'2019_08_19_000000_create_failed_jobs_table',1),(9,'2021_04_21_090629_add_columns_to_users_tale',1),(10,'2021_04_21_091102_create_roles_table',1),(11,'2021_04_21_091425_create_permissions_table',1),(12,'2021_04_21_091609_create_modules_table',1),(13,'2021_04_21_091836_create_permissionables_table',1),(14,'2021_04_21_092039_create_userables_table',1),(15,'2021_04_21_092121_create_moduleables_table',1),(16,'2021_04_21_131341_create_departments_table',1),(17,'2021_04_21_151759_create_groups_table',1),(18,'2021_04_23_105207_add_more_columns_to_users_table',1),(19,'2021_04_23_110728_create_budget_heads_table',1),(20,'2021_04_23_113056_create_sub_budget_heads_table',1),(21,'2021_04_25_013345_create_credit_budget_heads_table',1),(22,'2021_04_26_234140_create_grade_levels_table',1),(23,'2021_04_26_235940_create_benefits_table',1),(24,'2021_04_27_004302_add_even_more_columns_to_users_table',1),(25,'2021_04_27_020438_create_claims_table',1),(26,'2021_04_27_100312_create_instructions_table',1),(27,'2021_07_01_095900_create_price_lists_table',1),(28,'2021_07_01_103334_create_entitlements_table',1),(29,'2021_07_10_100239_add_columns_to_modules_table',1),(30,'2021_07_27_104426_create_expenditures_table',1),(31,'2021_08_02_125516_create_batches_table',1),(32,'2021_08_04_131611_create_work_flows_table',1),(33,'2021_08_04_131659_create_procedures_table',1),(34,'2021_08_04_133027_create_approvals_table',1),(35,'2021_08_10_084943_add_columns_to_batches_table',1),(36,'2021_08_10_110112_add_sub_budget_head_column_to_batches_table',1),(37,'2021_08_10_150501_add_columns_to_credit_budget_heads_table',1),(38,'2021_08_23_102012_create_refunds_table',1),(39,'2021_11_25_092733_add_type_column_to_modules_table',1),(40,'2022_01_25_101526_create_settings_table',2);
+INSERT INTO `migrations` VALUES (1,'2014_10_12_000000_create_users_table',1),(2,'2014_10_12_100000_create_password_resets_table',1),(3,'2016_06_01_000001_create_oauth_auth_codes_table',1),(4,'2016_06_01_000002_create_oauth_access_tokens_table',1),(5,'2016_06_01_000003_create_oauth_refresh_tokens_table',1),(6,'2016_06_01_000004_create_oauth_clients_table',1),(7,'2016_06_01_000005_create_oauth_personal_access_clients_table',1),(8,'2019_08_19_000000_create_failed_jobs_table',1),(9,'2021_04_21_090629_add_columns_to_users_tale',1),(10,'2021_04_21_091102_create_roles_table',1),(11,'2021_04_21_091425_create_permissions_table',1),(12,'2021_04_21_091609_create_modules_table',1),(13,'2021_04_21_091836_create_permissionables_table',1),(14,'2021_04_21_092039_create_userables_table',1),(15,'2021_04_21_092121_create_moduleables_table',1),(16,'2021_04_21_131341_create_departments_table',1),(17,'2021_04_21_151759_create_groups_table',1),(18,'2021_04_23_105207_add_more_columns_to_users_table',1),(19,'2021_04_23_110728_create_budget_heads_table',1),(20,'2021_04_23_113056_create_sub_budget_heads_table',1),(21,'2021_04_25_013345_create_credit_budget_heads_table',1),(22,'2021_04_26_234140_create_grade_levels_table',1),(23,'2021_04_26_235940_create_benefits_table',1),(24,'2021_04_27_004302_add_even_more_columns_to_users_table',1),(25,'2021_04_27_020438_create_claims_table',1),(26,'2021_04_27_100312_create_instructions_table',1),(27,'2021_07_01_095900_create_price_lists_table',1),(28,'2021_07_01_103334_create_entitlements_table',1),(29,'2021_07_10_100239_add_columns_to_modules_table',1),(30,'2021_07_27_104426_create_expenditures_table',1),(31,'2021_08_02_125516_create_batches_table',1),(32,'2021_08_04_131611_create_work_flows_table',1),(33,'2021_08_04_131659_create_procedures_table',1),(34,'2021_08_04_133027_create_approvals_table',1),(35,'2021_08_10_084943_add_columns_to_batches_table',1),(36,'2021_08_10_110112_add_sub_budget_head_column_to_batches_table',1),(37,'2021_08_10_150501_add_columns_to_credit_budget_heads_table',1),(38,'2021_08_23_102012_create_refunds_table',1),(39,'2021_11_25_092733_add_type_column_to_modules_table',1),(40,'2022_01_25_101526_create_settings_table',2),(41,'2022_02_15_150303_create_logistics_table',3),(42,'2022_02_24_164115_add_payment_status_to_expenditures_table',3);
 /*!40000 ALTER TABLE `migrations` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -495,7 +536,7 @@ DROP TABLE IF EXISTS `moduleables`;
 CREATE TABLE `moduleables` (
   `module_id` bigint unsigned NOT NULL,
   `moduleable_id` bigint unsigned NOT NULL,
-  `moduleable_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
+  `moduleable_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -518,12 +559,12 @@ DROP TABLE IF EXISTS `modules`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `modules` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `label` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `icon` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `path` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `component` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `file_path` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `label` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `icon` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `component` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `file_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `parentId` bigint NOT NULL DEFAULT '0',
   `isMenu` tinyint(1) NOT NULL DEFAULT '0',
   `generatePermissions` tinyint(1) NOT NULL DEFAULT '0',
@@ -532,7 +573,7 @@ CREATE TABLE `modules` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
-  `type` enum('application','module','page') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'application',
+  `type` enum('application','module','page') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'application',
   PRIMARY KEY (`id`),
   UNIQUE KEY `modules_label_unique` (`label`)
 ) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -556,11 +597,11 @@ DROP TABLE IF EXISTS `oauth_access_tokens`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `oauth_access_tokens` (
-  `id` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `user_id` bigint unsigned DEFAULT NULL,
   `client_id` bigint unsigned NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `scopes` text COLLATE utf8mb4_unicode_ci,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `scopes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `revoked` tinyint(1) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -588,10 +629,10 @@ DROP TABLE IF EXISTS `oauth_auth_codes`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `oauth_auth_codes` (
-  `id` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `user_id` bigint unsigned NOT NULL,
   `client_id` bigint unsigned NOT NULL,
-  `scopes` text COLLATE utf8mb4_unicode_ci,
+  `scopes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `revoked` tinyint(1) NOT NULL,
   `expires_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -618,10 +659,10 @@ DROP TABLE IF EXISTS `oauth_clients`;
 CREATE TABLE `oauth_clients` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned DEFAULT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `secret` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `provider` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `redirect` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `secret` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `provider` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `redirect` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `personal_access_client` tinyint(1) NOT NULL,
   `password_client` tinyint(1) NOT NULL,
   `revoked` tinyint(1) NOT NULL,
@@ -676,8 +717,8 @@ DROP TABLE IF EXISTS `oauth_refresh_tokens`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `oauth_refresh_tokens` (
-  `id` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `access_token_id` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `access_token_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `revoked` tinyint(1) NOT NULL,
   `expires_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -702,8 +743,8 @@ DROP TABLE IF EXISTS `password_resets`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `password_resets` (
-  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `token` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   KEY `password_resets_email_index` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -728,7 +769,7 @@ DROP TABLE IF EXISTS `permissionables`;
 CREATE TABLE `permissionables` (
   `permission_id` bigint unsigned NOT NULL,
   `permissionable_id` bigint unsigned NOT NULL,
-  `permissionable_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
+  `permissionable_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -751,9 +792,9 @@ DROP TABLE IF EXISTS `permissions`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `permissions` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `module` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `module` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -844,8 +885,8 @@ CREATE TABLE `refunds` (
   `department_id` bigint unsigned NOT NULL,
   `user_id` bigint unsigned NOT NULL,
   `sub_budget_head_id` bigint NOT NULL DEFAULT '0',
-  `description` longtext COLLATE utf8mb4_unicode_ci,
-  `status` enum('pending','approved','denied') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `description` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `status` enum('pending','approved','denied') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
   `closed` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -877,8 +918,8 @@ DROP TABLE IF EXISTS `roles`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `roles` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `label` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `label` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `max_slots` bigint NOT NULL DEFAULT '0',
   `start_date` date DEFAULT NULL,
   `expiry_date` date DEFAULT NULL,
@@ -911,13 +952,13 @@ DROP TABLE IF EXISTS `settings`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `settings` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `display_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `value` text COLLATE utf8mb4_unicode_ci,
-  `details` text COLLATE utf8mb4_unicode_ci,
-  `input_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'text',
+  `key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `display_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `value` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `details` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `input_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'text',
   `order` int NOT NULL DEFAULT '0',
-  `group` enum('site','admin') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'site',
+  `group` enum('site','admin') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'site',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -946,11 +987,11 @@ CREATE TABLE `sub_budget_heads` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `budget_head_id` bigint unsigned NOT NULL,
   `department_id` bigint unsigned NOT NULL,
-  `budgetCode` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `label` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
-  `type` enum('capital','recursive','personnel') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'capital',
+  `budgetCode` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `label` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `type` enum('capital','recursive','personnel') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'capital',
   `logisticsBudget` tinyint(1) NOT NULL DEFAULT '0',
   `active` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
@@ -984,7 +1025,7 @@ DROP TABLE IF EXISTS `userables`;
 CREATE TABLE `userables` (
   `user_id` bigint unsigned NOT NULL,
   `userable_id` bigint unsigned NOT NULL,
-  `userable_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
+  `userable_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1007,18 +1048,18 @@ DROP TABLE IF EXISTS `users`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `staff_no` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `staff_no` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `grade_level_id` bigint NOT NULL DEFAULT '0',
   `department_id` bigint NOT NULL DEFAULT '0',
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `email_verified_at` timestamp NULL DEFAULT NULL,
-  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `isAdministrator` tinyint(1) NOT NULL DEFAULT '0',
   `canAccessBudgetPortal` tinyint(1) NOT NULL DEFAULT '0',
-  `avatar` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `avatar` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `points` decimal(30,2) NOT NULL DEFAULT '0.00',
-  `remember_token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `remember_token` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -1046,9 +1087,9 @@ DROP TABLE IF EXISTS `work_flows`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `work_flows` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `label` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `rule` enum('sequence','broadcast') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'sequence',
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `label` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `rule` enum('sequence','broadcast') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'sequence',
   `active` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -1075,4 +1116,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-02-02 13:47:01
+-- Dump completed on 2022-02-24 21:12:27

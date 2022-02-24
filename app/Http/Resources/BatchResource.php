@@ -17,7 +17,6 @@ class BatchResource extends JsonResource
         // return parent::toArray($request);
         return [
             'id' => $this->id,
-            'controller' => new UserResource($this->initiator),
             'batch_no' => $this->batch_no,
             'amount' => $this->amount,
             'noOfClaim' => $this->noOfClaim,
@@ -28,6 +27,7 @@ class BatchResource extends JsonResource
             'audit' => $this->audit,
             'editable' => $this->editable,
             'steps' => $this->steps,
+            'controller' => new UserResource($this->initiator),
             'expenditures' => ExpenditureResource::collection($this->expenditures)
         ];
     }
