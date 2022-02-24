@@ -28,7 +28,8 @@ class BatchResource extends JsonResource
             'editable' => $this->editable,
             'steps' => $this->steps,
             'controller' => new UserResource($this->initiator),
-            'expenditures' => ExpenditureResource::collection($this->expenditures)
+            'expenditures' => ExpenditureResource::collection($this->expenditures),
+            'batched' => $this->batched == 1 ? true : false
         ];
     }
 }
