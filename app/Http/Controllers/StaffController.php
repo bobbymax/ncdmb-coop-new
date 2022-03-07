@@ -170,6 +170,24 @@ class StaffController extends Controller
         ], 200);
     }
 
+    public function fetStaffRecord($user) {
+        $user = User::where('staff_no', $user)->first();
+
+        if(! $user) {
+            return response()->json([
+                'data' => null,
+                'status' => 'error',
+                'message' => 'Invalid token entered'
+            ], 422);
+        }
+
+        return response()->json([
+            'data' => new UserResource($user),
+            'status' => 'success',
+            'message' => 'User Details'
+        ], 200);
+    }
+
     /**
      * Update the specified resource in storage.
      *

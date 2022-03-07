@@ -13,11 +13,13 @@ use App\Models\Module;
 use App\Models\SubBudgetHead;
 use App\Models\CreditBudgetHead;
 use App\Models\User;
+use App\Models\GradeLevel;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use DB;
 
 class ImportController extends Controller
 {
@@ -60,6 +62,12 @@ class ImportController extends Controller
             case "modules" :
                 $this->result = $this->moduleBulkAdd($request->data);
                 break;
+            case "roles" :
+                $this->result = $this->rolesBulkAdd($request->data);
+                break;
+            case "grade-levels" :
+                $this->result = $this->gradeLevelBulkAdd($request->data);
+                break;
             default :
                 $this->result = [];
                 break;
@@ -74,59 +82,92 @@ class ImportController extends Controller
 
     protected function budgetHeadBulkAdd(array $data)
     {
-        foreach ($data as $value) {
-            $budgetHead = BudgetHead::where('budgetId', $value['S/NO'])->first();
+        $dataChunk = [];
+
+        foreach ($data as $key => $value) {
+            $budgetHead = BudgetHead::where('budgetId', $value['BN'])->first();
 
             if (! $budgetHead) {
-                $budgetHead = BudgetHead::create([
-                    'budgetId' => $value['S/NO'],
-                    'name' => $value['BUDGET HEAD'],
-                    'label' => Str::slug($value['BUDGET HEAD'])
-                ]);
-            }
+                $insertData = [
+                    'budgetId' => $value['BN'],
+                    'name' => $value['NAME'],
+                    'label' => Str::slug($value['NAME'])
+                ];
 
-            $this->bulkRecords[] = $budgetHead;
+                $dataChunk[] = $insertData;
+            }
+            
+
         }
 
-        return $this->bulkRecords;
+        $dataChunk = collect($dataChunk);
+        $chunks = $dataChunk->chunk(100);
+        return $this->insertInto('budget_heads', $chunks);
+    }
+
+    protected function rolesBulkAdd(array $data)
+    {
+        $dataChunk = [];
+
+        foreach ($data as $key => $value) {
+            $label = Str::slug($value['NAME']);
+            $role = Role::where('label', $label)->first();
+
+            if (! $role) {
+                $insertData = [
+                    'name' => $value['NAME'],
+                    'label' => $label,
+                    'max_slots' => $value['SLOT'],
+                    'isSuper' => $value['SUPER'] == 1 ? true : false, 
+                    'cannot_expire' => $value['EXPIRE'] == 1 ? true : false,
+                    'start_date' => Carbon::now(),
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+                ];
+
+                $dataChunk[] = $insertData;
+            }
+            
+
+        }
+
+        $dataChunk = collect($dataChunk);
+        $chunks = $dataChunk->chunk(100);
+        return $this->insertInto('roles', $chunks);
     }
 
     protected function subBudgetHeadBulkAdd(array $data)
     {
         foreach ($data as $value) {
-            $subBudgetHead = SubBudgetHead::where('budgetCode', $value['CODES'])->first();
+            $budgetHead = BudgetHead::where('budgetId', $value['BH'])->first();
+            $department = Department::where('code', $value['DEPARTMENT'])->first();
 
-            if (! $subBudgetHead) {
-                $budgetHead = BudgetHead::where('budgetId', $value['BH'])->first();
-                $department = Department::where('code', $value['DEPT'])->first();
+            if ($budgetHead && $department) {
+                $subBudgetHead = SubBudgetHead::create([
+                    'budget_head_id' => $budgetHead->id,
+                    'department_id' => $department->id,
+                    'budgetCode' => $value['CODE'],
+                    'name' => $value['NAME'],
+                    'label' => Str::slug($value['NAME']),
+                    'description' => "EMPTY VALUE",
+                    'type' => "capital",
+                    'active' => true
+                ]);
 
-                if ($budgetHead && $department) {
-                    $subBudgetHead = SubBudgetHead::create([
-                        'budget_head_id' => $budgetHead->id,
-                        'department_id' => $department->id,
-                        'budgetCode' => $value['CODES'],
-                        'name' => $value['NAME'],
-                        'label' => Str::slug($value['NAME']),
-                        'description' => "EMPTY VALUE",
-                        'type' => "capital",
-                        'active' => true
-                    ]);
-
-                    $fund = CreditBudgetHead::create([
-                        'sub_budget_head_id' => $subBudgetHead->id,
-                        'description' => 'FUNDING',
-                        'approved_amount' => $value['AMOUNT'],
-                        'booked_balance' => $value['AMOUNT'],
-                        'actual_balance' => $value['AMOUNT'],
-                        'budget_year' => date('Y')
-                    ]);
-                }
+                $fund = CreditBudgetHead::create([
+                    'sub_budget_head_id' => $subBudgetHead->id,
+                    'description' => 'FUNDING',
+                    'approved_amount' => $value['APPROVED'],
+                    'booked_balance' => $value['APPROVED'],
+                    'actual_balance' => $value['APPROVED'],
+                    'budget_year' => config('settings.budget_year') ?? config('budget.budget_year')
+                ]);
             }
 
             $this->bulkRecords[] = $subBudgetHead;
         }
 
-        return SubBudgetHeadResource::collection($this->bulkRecords);
+        return $this->bulkRecords;
     }
 
     protected function departmentBulkAdd(array $data)
@@ -136,16 +177,15 @@ class ImportController extends Controller
 
             if (! $department) {
 
-                if ($value['Parent'] !== "NONE") {
-                    $this->parent = Department::where('code', $value['Parent'])->first();
-                }
+                $parent = $value['Parent'] !== 'NONE' ? Department::where('code', $value['Parent'])->first() : null;
+                $parentId = $parent !== null ? $parent->id : 0;
 
                 $department = Department::create([
                     'name' => $value['Name'],
                     'label' => Str::slug($value['Name']),
                     'code' => $value['Code'],
                     'type' => strtolower($value['Type']),
-                    'parentId' => $this->parent ? $this->parent->id : 0
+                    'parentId' => $parentId,
                 ]);
             }
 
@@ -158,8 +198,8 @@ class ImportController extends Controller
     protected function moduleBulkAdd(array $data)
     {
         foreach($data as $value) {
-            $module_str = Str::slug($value['name']);
-            $module = Module::where('label', $module_str)->first();
+            $label = Str::slug($value['name']);
+            $module = Module::where('label', $label)->first();
 
             if (! $module) {
 
@@ -169,15 +209,15 @@ class ImportController extends Controller
 
                 $module = Module::create([
                     'name' => $value['name'],
-                    'label' => $module_str,
+                    'label' => $label,
                     'path' => $value['path'],
-                    'generatePermissions' => $value['generatePermissions'] === "on" ? true : false,
-                    'isAdministration' => $value['isAdministration'],
+                    'generatePermissions' => $value['generatePermissions'] == 1 ? true : false,
+                    'isAdministration' => $value['isAdministration'] == 1 ? true : false,
                     'type' => $value['type'],
                     'parentId' => $this->parent ? $this->parent->id : 0
                 ]);
 
-                if ($value['generatePermissions'] === "on") {
+                if ($value['generatePermissions'] == 1) {
                     foreach ($module->normalizer($module->name) as $value) {
                         $permission = $module->savePermission($value, $module->name);
 
@@ -193,6 +233,28 @@ class ImportController extends Controller
         }
 
         return ModuleResource::collection($this->bulkRecords);
+    }
+
+    protected function gradeLevelBulkAdd(array $data)
+    {
+        foreach($data as $value) {
+            $label = Str::slug($value['name']);
+            $gradeLevel = GradeLevel::where('label', $label)->first();
+
+            if (! $gradeLevel) {
+
+                $gradeLevel = GradeLevel::create([
+                    'name' => $value['name'],
+                    'label' => $label,
+                    'code' => $value['key'],
+                ]);
+
+            }
+
+            $this->bulkRecords[] = $gradeLevel;
+        }
+
+        return $this->bulkRecords;
     }
 
     protected function staffBulkAdd(array $data)
@@ -227,5 +289,14 @@ class ImportController extends Controller
         }
 
         return UserResource::collection($this->bulkRecords);
+    }
+
+    protected function insertInto($table, $chunks) 
+    {
+        foreach ($chunks as $chunk) {
+            DB::table($table)->insert($chunk->toArray());
+        }
+
+        return;
     }
 }

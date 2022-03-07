@@ -17,7 +17,7 @@ class SubBudgetHeadResource extends JsonResource
      */
     public function toArray($request)
     {
-        $year = 2021;
+        $year = config('settings.budget_year') ?? config('budget.budget_year');
         $fund = $this->getCurrentFund($year);
 
         if ($fund) {
@@ -54,7 +54,7 @@ class SubBudgetHeadResource extends JsonResource
 
     public function getTotals()
     {
-        $currentYear = 2021;
+        $currentYear = config('settings.budget_year') ?? config('budget.budget_year');;
 
         foreach($this->department->subBudgetHeads as $subBudgetHead)
         {

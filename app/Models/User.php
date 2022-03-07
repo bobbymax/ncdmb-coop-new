@@ -59,6 +59,16 @@ class User extends Authenticatable
         return $this->hasMany(Claim::class);
     }
 
+    // public function tourings()
+    // {
+    //     return $this->hasMany(TouringAdvance::class, 'user_id');
+    // }
+
+    public function canCreateTourings()
+    {
+        return $this->hasMany(TouringAdvance::class, 'controller_id');
+    }
+
     public function assignRole(Role $role)
     {
         return $this->roles()->save($role);

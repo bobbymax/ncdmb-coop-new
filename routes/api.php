@@ -9,6 +9,7 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     Route::get('entitlements/dependencies', 'EntitlementController@getEntitlementDependencies');
     Route::post('load/entitlements', 'EntitlementController@saveBatchEntitlements');
     Route::get('load/wages/dependencies', 'PriceListController@getDependencies');
+    Route::get('fetch/users/{user}', 'StaffController@fetStaffRecord');
 
     // Configuration Routes
     Route::get('get/models', 'ConfigurationController@fetchModels');
@@ -20,6 +21,7 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     Route::get('budgetSummary', 'BudgetSummaryController@getBudgetOverview');
     Route::post('getPerformance', 'BudgetSummaryController@chartDisplay');
     Route::get('departments/{department}/budget/summary', 'BudgetSummaryController@getBudgetSummary');
+    Route::post('portal/configuration', 'ConfigurationController@update');
     Route::get('dashboard/overview', 'DashboardController@init');
 
     // Access Control
@@ -58,6 +60,8 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     Route::apiResource('claims/{claim}/instructions', 'InstructionController');
     Route::get('fetch/claims/{claim}', 'ClaimController@fetchClaimByCode');
     Route::post('claim/instructions', 'InstructionController@addClaimInstructions');
+    Route::apiResource('touringAdvances', 'TouringAdvanceController');
+    Route::patch('raise/touringAdvances/{touringAdvance}', 'TouringAdvanceController@changeTouringAdvanceStatus');
 
     // Additional Access Control Routes
     Route::post('groups/{group}/staffs', 'GroupController@addStaffsToGroup');

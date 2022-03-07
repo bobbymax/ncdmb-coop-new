@@ -35,11 +35,6 @@ class DashboardController extends Controller
 
     protected function getBudgetUtilization()
     {
-        // display: [expenditure, balance]
-        // budget controller department
-        // fetch total actual expenditure 
-        // fetch total actual balance
-        // change value to percentage
 
         $actualExpenditure = 0;
         $actualBalance = 0;
@@ -98,13 +93,15 @@ class DashboardController extends Controller
         foreach (auth()->user()->department->subBudgetHeads as $subBudgetHead) {
             $fund = $subBudgetHead->getCurrentFund($this->returnBudgetYear());
 
-            $approvedAmount += $fund->approved_amount;
-            $bookedExpenditure += $fund->booked_expenditure;
-            $actualExpenditure += $fund->actual_expenditure;
-            $bookedBalance += $fund->booked_balance;
-            $actualBalance += $fund->actual_balance;
-            $expectedPerformance += $fund->approved_amount != 0 ? ($fund->booked_expenditure / $fund->approved_amount) * 100 : 0;
-            $actualPerformance += $fund->approved_amount != 0 ? ($fund->actual_expenditure / $fund->approved_amount) * 100 : 0;
+            if ($fund) {
+                $approvedAmount += $fund->approved_amount;
+                $bookedExpenditure += $fund->booked_expenditure;
+                $actualExpenditure += $fund->actual_expenditure;
+                $bookedBalance += $fund->booked_balance;
+                $actualBalance += $fund->actual_balance;
+                $expectedPerformance += $fund->approved_amount != 0 ? ($fund->booked_expenditure / $fund->approved_amount) * 100 : 0;
+                $actualPerformance += $fund->approved_amount != 0 ? ($fund->actual_expenditure / $fund->approved_amount) * 100 : 0;
+            }
         }
 
         return compact('approvedAmount', 'bookedExpenditure', 'actualExpenditure', 'bookedBalance', 'actualBalance', 'expectedPerformance', 'actualPerformance');

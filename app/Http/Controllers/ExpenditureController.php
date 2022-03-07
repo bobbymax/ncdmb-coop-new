@@ -92,7 +92,7 @@ class ExpenditureController extends Controller
             'additional_info' => $request->additional_info
         ]);
 
-        if ($expenditure) {
+        if ($expenditure && $expenditure->subBudgetHead($budgetYear) !== null) {
             $expenditure->subBudgetHead->getCurrentFund($budgetYear)->booked_expenditure += $expenditure->amount;
             $expenditure->subBudgetHead->getCurrentFund($budgetYear)->booked_balance -= $expenditure->amount;
             $expenditure->subBudgetHead->getCurrentFund($budgetYear)->save();

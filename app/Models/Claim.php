@@ -25,4 +25,9 @@ class Claim extends Model
     {
         return $this->hasOne(Expenditure::class);
     }
+
+    public function touringAdvance()
+    {
+        return $this->hasOne(TouringAdvance::class);
+    }
 }

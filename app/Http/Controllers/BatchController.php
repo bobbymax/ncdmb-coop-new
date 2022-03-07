@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Validator;
 
 class BatchController extends Controller
 {
+
     public function __construct()
     {
         $this->middleware('auth:api');
@@ -95,6 +96,7 @@ class BatchController extends Controller
                 if ($expenditure) {
                     $expenditure->batch_id = $batch->id;
                     $expenditure->status = "batched";
+                    $expenditure->batched = true;
                     $expenditure->save();
 
                     $approval = new Approval;
@@ -122,8 +124,7 @@ class BatchController extends Controller
             'level' => 'required|string',
             'status' => 'required|string',
             'work_flow' => 'required|string',
-            'batchId' => 'required|integer',
-            'description' => 'required'
+            'batchId' => 'required|integer'
         ]);
 
         if ($validator->fails()) {
@@ -152,20 +153,21 @@ class BatchController extends Controller
         $approval->status = $request->status;
         $batch->approvals()->save($approval);
 
-        $this->processNextStep($batch->id, $approval->level);
+        $message = $this->processNextStep($batch, $approval->level);
 
         return response()->json([
             'data' => new BatchResource($batch),
             'status' => 'success',
-            'message' => 'Batch payment cleared successfully!!'
+            'message' => $message
         ], 201);
     }
 
-    protected function processNextStep($batchId, $level)
+    protected function processNextStep(Batch $batch, $level)
     {
-        $batch = Batch::find($batchId);
+        // $batch = Batch::find($batchId);
         $subBudgetHead = SubBudgetHead::where('budgetCode', $batch->subBudgetHeadCode)->first();
-        $budgetYear = config('site.budget_year') ?? config('budget.budget_year');
+        // $budgetYear = config('site.budget_year') ?? config('budget.budget_year');
+        $message = "";
 
         switch ($level) {
             case 'treasury' :
@@ -175,16 +177,20 @@ class BatchController extends Controller
                     $batch->treasury = false;
                     $batch->audit = true;
                     $batch->save();
+
+                    $message = "Batch has been cleared by Treasury!!";
                 } else {
                     $batch->editable = false;
                     $batch->closed = true;
                     $batch->status = 'paid';
                     $batch->save();
 
-                    $subBudgetHead->getCurrentFund($budgetYear)->actual_expenditure += $batch->amount;
-                    $subBudgetHead->getCurrentFund($budgetYear)->actual_balance -= $batch->amount;
+                    $subBudgetHead->getCurrentFund($this->getBudgetYear())->actual_expenditure += $batch->amount;
+                    $subBudgetHead->getCurrentFund($this->getBudgetYear())->actual_balance -= $batch->amount;
 
-                    $subBudgetHead->getCurrentFund($budgetYear)->save();
+                    $subBudgetHead->getCurrentFund($this->getBudgetYear())->save();
+
+                    $message = "Batch payment has been posted by Treasury!!";
                 }
                 break;
             case 'audit' :
@@ -193,6 +199,7 @@ class BatchController extends Controller
                 $batch->treasury = true;
                 $batch->audit = false;
                 $batch->save();
+                $message = "Batch has been cleared by Audit!!";
                 break;
             default :
                 $batch->level = 'treasury';
@@ -201,7 +208,11 @@ class BatchController extends Controller
                 $batch->budget = false;
                 $batch->editable = true;
                 $batch->save();
+                $message = "Batch has been cleared by Budget Office!!";
+                break;
         }
+
+        return $message;
     }
 
     /**
@@ -292,6 +303,11 @@ class BatchController extends Controller
             'status' => 'success',
             'message' => 'Batch details'
         ], 200);
+    }
+
+    protected function getBudgetYear()
+    {
+        return config('site.budget_year') ?? config('budget.budget_year');
     }
 
     /**

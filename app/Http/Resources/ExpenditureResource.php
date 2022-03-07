@@ -34,6 +34,7 @@ class ExpenditureResource extends JsonResource
             'refunded' => $this->refund,
             'created_at' => $this->created_at->format('M, Y'),
             'updated_at' => $this->updated_at->format('M, Y'),
+            'batched' => $this->batched == 1 ? true : false
         ];
     }
 }
