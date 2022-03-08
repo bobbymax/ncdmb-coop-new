@@ -24,7 +24,9 @@ class SubBudgetHeadController extends Controller
      */
     public function index()
     {
-        $subBudgetHeads = SubBudgetHead::latest()->get();
+        $subBudgetHeads = ! auth()->user()->isAdministrator ? SubBudgetHead::where('department_id', auth()->user()->department_id)->latest()->get() : SubBudgetHead::latest()->get();
+
+
 
         if ($subBudgetHeads->count() < 1) {
             return response()->json([
