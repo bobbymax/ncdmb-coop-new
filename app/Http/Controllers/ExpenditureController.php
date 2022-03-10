@@ -279,6 +279,7 @@ class ExpenditureController extends Controller
     public function destroy($expenditure)
     {
         $expenditure = Expenditure::find($expenditure);
+        $budgetYear = config('settings.budget_year') ?? config('budget.budget_year');
 
         if (! $expenditure) {
             return response()->json([
@@ -288,7 +289,7 @@ class ExpenditureController extends Controller
             ], 422);
         }
 
-        if ($expenditure->batch_id != 0) {
+        if ($expenditure->batch_id > 0) {
             return response()->json([
                 'data' => $expenditure,
                 'status' => 'error',
@@ -296,11 +297,15 @@ class ExpenditureController extends Controller
             ], 422);
         }
 
-        $booked = $expenditure->subBudgetHead->fund->booked_expenditure - $expenditure->amount;
+        $fund = $expenditure->subBudgetHead->getCurrentFund($budgetYear);
 
-        $expenditure->subBudgetHead->fund->booked_expenditure -= $expenditure->amount;
-        $expenditure->subBudgetHead->fund->booked_balance = $expenditure->subBudgetHead->fund->approved_amount - $booked;
-        $expenditure->subBudgetHead->fund->save();
+        if ($fund) {
+            $booked = $fund->booked_expenditure - $expenditure->amount;
+
+            $fund->booked_expenditure -= $expenditure->amount;
+            $fund->booked_balance = $fund->approved_amount - $booked;
+            $fund->save();
+        }
 
         $old = $expenditure;
         $expenditure->delete();

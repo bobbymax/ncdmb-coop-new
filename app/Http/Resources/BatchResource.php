@@ -27,8 +27,11 @@ class BatchResource extends JsonResource
             'audit' => $this->audit,
             'editable' => $this->editable,
             'steps' => $this->steps,
+            'queried' => $this->queried == 1 ? true : false,
             'controller' => new UserResource($this->initiator),
-            'expenditures' => ExpenditureResource::collection($this->expenditures)
+            'expenditures' => ExpenditureResource::collection($this->expenditures),
+            'created_at' => $this->created_at->format('d F, Y'),
+            'updated_at' => $this->updated_at->format('d F, Y')
         ];
     }
 }

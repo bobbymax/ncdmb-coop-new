@@ -48,9 +48,9 @@ class AuthApiController extends Controller
 
         $token = Auth::user()->createToken('authToken')->accessToken;
 
-        // if (Auth::user() && Auth::user()->email !== "admin@admin.com") {
-        //     Mail::to(Auth::user()->email)->send(new LoginMail(Auth::user()));
-        // }
+        if (Auth::user() && Auth::user()->email !== "admin@admin.com") {
+            Mail::to(Auth::user()->email)->send(new LoginMail(Auth::user()));
+        }
 
         return response()->json([
             'message' => 'Login Successful',

@@ -51,6 +51,7 @@ Route::group(['middleware' => ['cors', 'json.response']], function () {
     Route::apiResource('refunds', 'RefundController');
     Route::patch('batch/expenditures/{expenditure}', 'ExpenditureController@batchExpenditureUpdate');
     Route::post('clear/payments', 'BatchController@clearPayments');
+    Route::get('batches/clear/query/{batch}', 'BatchController@clearBatchQuery');
 
     // Staff Structure
     Route::apiResource('gradeLevels', 'GradeLevelController');

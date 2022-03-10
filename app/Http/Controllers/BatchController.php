@@ -10,6 +10,9 @@ use App\Models\SubBudgetHead;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Mail\QueriedBatchPayment;
+use App\Mail\ClearedBatchPaymentQueryMail;
+use Mail;
 
 class BatchController extends Controller
 {
@@ -145,6 +148,11 @@ class BatchController extends Controller
             ], 422);
         }
 
+        if ($request->status === "queried") {
+            $batch->status = $request->status;
+            $batch->save();
+        }
+
         $approval = new Approval;
         $approval->user_id = auth()->user()->id;
         $approval->work_flow = $request->work_flow;
@@ -153,7 +161,7 @@ class BatchController extends Controller
         $approval->status = $request->status;
         $batch->approvals()->save($approval);
 
-        $message = $this->processNextStep($batch, $approval->level);
+        $message = $this->processNextStep($batch, $approval->level, $approval->description);
 
         return response()->json([
             'data' => new BatchResource($batch),
@@ -162,7 +170,7 @@ class BatchController extends Controller
         ], 201);
     }
 
-    protected function processNextStep(Batch $batch, $level)
+    protected function processNextStep(Batch $batch, $level, $description="")
     {
         // $batch = Batch::find($batchId);
         $subBudgetHead = SubBudgetHead::where('budgetCode', $batch->subBudgetHeadCode)->first();
@@ -194,12 +202,19 @@ class BatchController extends Controller
                 }
                 break;
             case 'audit' :
-                $batch->level = 'treasury';
-                $batch->steps = 4;
-                $batch->treasury = true;
-                $batch->audit = false;
-                $batch->save();
-                $message = "Batch has been cleared by Audit!!";
+                if ($batch->status !== "queried") {
+                    $batch->level = 'treasury';
+                    $batch->steps = 4;
+                    $batch->treasury = true;
+                    $batch->audit = false;
+                    $batch->save();
+                    $message = "Batch has been cleared by Audit!!";
+                } else {
+                    $batch->queried = true;
+                    if ($batch->save()) {
+                        Mail::to($batch->initiator->email)->queue(new QueriedBatchPayment($batch, $description));
+                    }
+                }
                 break;
             default :
                 $batch->level = 'treasury';
@@ -213,6 +228,30 @@ class BatchController extends Controller
         }
 
         return $message;
+    }
+
+    public function clearBatchQuery($batchId)
+    {
+        $batch = Batch::find($batchId);
+
+        if (! $batch) {
+            return response()->json([
+                'data' => null,
+                'status' => 'error',
+                'message' => 'Invalid ID selected'
+            ], 422);
+        }
+
+        $batch->queried = false;
+        if ($batch->save()) {
+            Mail::to($batch->initiator->email)->queue(new ClearedBatchPaymentQueryMail($batch));
+        }
+
+        return response()->json([
+            'data' => new BatchResource($batch),
+            'status' => 'success',
+            'message' => 'Batch query has now been cleared'
+        ], 200);
     }
 
     /**

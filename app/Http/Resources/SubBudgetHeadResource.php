@@ -7,7 +7,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class SubBudgetHeadResource extends JsonResource
 {
 
-    protected $approvedAmount, $bookedExpenditure, $actualExpenditure, $bookedBalance, $actualBalance, $exp, $act;
+    protected $exp, $act;
 
     /**
      * Transform the resource into an array.
@@ -47,34 +47,36 @@ class SubBudgetHeadResource extends JsonResource
             'actual_balance' => $fund ? $fund->actual_balance : 0,
             'expected_performance' => $fund && $this->exp ? round($this->exp) . '%' : 0,
             'actual_performance' => $fund && $this->act ? round($this->act) . '%' : 0,
-            'totals' => $this->getTotals(),
-            'expenditures' => ExpenditureResource::collection($this->expenditures)
+            // 'totals' => $this->getTotals(),
+            'expenditures' => ExpenditureResource::collection($this->expenditures),
+            'updated_at' => $this->updated_at->format('M, Y'),
+            'created_at' => $this->created_at->format('M, Y'),
         ];
     }
 
-    public function getTotals()
-    {
-        $currentYear = config('settings.budget_year') ?? config('budget.budget_year');;
+    // public function getTotals()
+    // {
+    //     $currentYear = config('settings.budget_year') ?? config('budget.budget_year');;
 
-        foreach($this->department->subBudgetHeads as $subBudgetHead)
-        {
-            $fund = $subBudgetHead->getCurrentFund($currentYear);
+    //     foreach($this->department->subBudgetHeads as $subBudgetHead)
+    //     {
+    //         $fund = $subBudgetHead->getCurrentFund($currentYear);
 
-            if ($fund) {
-                $this->approvedAmount += $fund->approved_amount;
-                $this->bookedExpenditure += $fund->booked_expenditure;
-                $this->actualExpenditure += $fund->actual_expenditure;
-                $this->bookedBalance += $fund->booked_balance;
-                $this->actualBalance += $fund->actual_balance;
-            }
-        }
+    //         if ($fund) {
+    //             $this->approvedAmount += $fund->approved_amount;
+    //             $this->bookedExpenditure += $fund->booked_expenditure;
+    //             $this->actualExpenditure += $fund->actual_expenditure;
+    //             $this->bookedBalance += $fund->booked_balance;
+    //             $this->actualBalance += $fund->actual_balance;
+    //         }
+    //     }
 
-        $appAmount = $this->approvedAmount ?? 0;
-        $bookExp = $this->bookedExpenditure ?? 0;
-        $actExp = $this->actualExpenditure ?? 0;
-        $bookBal = $this->bookedBalance ?? 0;
-        $actBal = $this->actualBalance ?? 0;
+    //     $appAmount = $this->approvedAmount ?? 0;
+    //     $bookExp = $this->bookedExpenditure ?? 0;
+    //     $actExp = $this->actualExpenditure ?? 0;
+    //     $bookBal = $this->bookedBalance ?? 0;
+    //     $actBal = $this->actualBalance ?? 0;
 
-        return compact('appAmount', 'bookExp', 'actExp', 'bookBal', 'actBal');
-    }
+    //     return compact('appAmount', 'bookExp', 'actExp', 'bookBal', 'actBal');
+    // }
 }

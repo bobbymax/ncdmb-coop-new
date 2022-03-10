@@ -35,7 +35,6 @@ class DashboardController extends Controller
 
     protected function getBudgetUtilization()
     {
-
         $actualExpenditure = 0;
         $actualBalance = 0;
         $budgetYear = config('site.budget_year') ?? config('budget.budget_year');
